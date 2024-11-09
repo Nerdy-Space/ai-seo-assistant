@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface Variant {
     name: string;
-    conversions: string; // as string for initial input
-    visitors: string;    // as string for initial input
+    conversions: number;
+    visitors: number;
 }
 
 interface ParsedVariant {
@@ -19,7 +20,7 @@ interface Result {
     name: string;
     improvement: string;
     significance: boolean;
-    certainty: string | number;
+    certainty: string;
 }
 
 interface CalculationResult {
@@ -27,21 +28,22 @@ interface CalculationResult {
     bestVariant: ParsedVariant;
     bestImprovement: string;
     results: Result[];
+    isSignificant: boolean;
 }
 
 const Calculator: React.FC = () => {
     const [variants, setVariants] = useState<Variant[]>([
-        { name: 'A', conversions: '', visitors: '' },
-        { name: 'B', conversions: '', visitors: '' }
+        { name: 'A', conversions: 90, visitors: 1000 },
+        { name: 'B', conversions: 120, visitors: 1000 }
     ]);
     const [result, setResult] = useState<CalculationResult | null>(null);
 
     const addVariant = () => {
-        const newVariantName = String.fromCharCode(65 + variants.length); // Assigns next letter (C, D, etc.)
-        setVariants([...variants, { name: newVariantName, conversions: '', visitors: '' }]);
+        const newVariantName = String.fromCharCode(65 + variants.length);
+        setVariants([...variants, { name: newVariantName, conversions: 1000, visitors: 1000 }]);
     };
 
-    const updateVariant = (index: number, field: 'conversions' | 'visitors', value: string) => {
+    const updateVariant = (index: number, field: 'conversions' | 'visitors', value: number) => {
         const updatedVariants = [...variants];
         updatedVariants[index][field] = value;
         setVariants(updatedVariants);
@@ -50,9 +52,9 @@ const Calculator: React.FC = () => {
     const calculateSignificance = () => {
         const parsedVariants: ParsedVariant[] = variants.map(variant => ({
             name: variant.name,
-            conversions: parseFloat(variant.conversions),
-            visitors: parseFloat(variant.visitors),
-            conversionRate: parseFloat(variant.conversions) / parseFloat(variant.visitors),
+            conversions: variant.conversions,
+            visitors: variant.visitors,
+            conversionRate: (variant.conversions / variant.visitors) * 100,
         }));
 
         const baseline = parsedVariants[0];
@@ -63,21 +65,37 @@ const Calculator: React.FC = () => {
 
         let bestVariant = baseline;
         let bestImprovement = 0;
+        let isSignificant = false;
 
         const results = parsedVariants.slice(1).map(variant => {
-            const improvement = ((variant.conversionRate - baseline.conversionRate) / baseline.conversionRate) * 100;
-            const significance = Math.abs(improvement) > 0.05; // Threshold for significance
+            // Calculate improvement as a relative percentage (not absolute)
+            const improvement = ((baseline.conversionRate - variant.conversionRate) / variant.conversionRate) * 100;
+
+            // Calculate Z-score for significance
+            const p1 = baseline.conversions / baseline.visitors;
+            const p2 = variant.conversions / variant.visitors;
+            const pPool = (baseline.conversions + variant.conversions) / (baseline.visitors + variant.visitors);
+            const zScore = (p1 - p2) / Math.sqrt(pPool * (1 - pPool) * (1 / baseline.visitors + 1 / variant.visitors));
+            const certainty = Math.min(100, Math.abs(zScore) * 10); // Adjust certainty based on Z-score, capped at 100%
 
             if (improvement > bestImprovement) {
                 bestImprovement = improvement;
                 bestVariant = variant;
             }
 
+            // Calculate significance
+            const pValue = Math.exp(-0.717 * Math.abs(zScore) - 0.416 * zScore * zScore); // Approximate p-value from Z-score
+            const significance = pValue < 0.05;
+
+            if (significance) {
+                isSignificant = true;
+            }
+
             return {
                 name: variant.name,
                 improvement: improvement.toFixed(2),
                 significance,
-                certainty: significance ? 100 : (Math.abs(improvement) * 100).toFixed(2),
+                certainty: `${certainty.toFixed(2)}%`,
             };
         });
 
@@ -86,53 +104,87 @@ const Calculator: React.FC = () => {
             bestVariant,
             bestImprovement: bestImprovement.toFixed(2),
             results,
+            isSignificant
         });
     };
 
+
     return (
-        <div className="max-w-[1440px] mx-auto">
-            
-            <h2 className="">A/B Testing Significance Calculator</h2>
+        <div className="max-w-[1440px] mx-auto px-4 pt-10">
+            <div className="flex gap-x-4">
+                <div className="md:w-[60vw]">
+                    <h2 className="font-semibold text-xl mb-4">A/B Testing Significance Calculator</h2>
 
-            {variants.map((variant, index) => (
-                <div key={index}>
-                    <h3>Variant {variant.name}</h3>
-                    <label>Conversions:</label>
-                    <Input
-                        type="number"
-                        value={variant.conversions}
-                        onChange={(e) => updateVariant(index, 'conversions', e.target.value)}
-                    />
-                    <label>Visitors:</label>
-                    <Input
-                        type="number"
-                        value={variant.visitors}
-                        onChange={(e) => updateVariant(index, 'visitors', e.target.value)}
-                    />
-                </div>
-            ))}
+                    {variants.map((variant, index) => (
+                        <div key={index} className="mb-2">
+                            <h3 className="underline font-medium text-lg">Variant {variant.name}</h3>
+                            <div className="flex items-center gap-x-4 w-full">
+                                <div className='w-full'>
+                                    <label>Visitors:</label>
+                                    <Input
+                                        type="number"
+                                        value={variant.visitors}
+                                        className="w-full"
+                                        onChange={(e) => updateVariant(index, 'visitors', parseInt(e.target.value))}
+                                    />
+                                </div>
+                                <div className='w-full'>
+                                    <label>Conversions:</label>
+                                    <Input
+                                        type="number"
+                                        value={variant.conversions}
+                                        className="w-full"
+                                        onChange={(e) => updateVariant(index, 'conversions', parseInt(e.target.value))}
+                                    />
+                                </div>
+                                <div className='w-full'>
+                                    <label>Conversion rate</label>
+                                    <p>{((variant.conversions / variant.visitors) * 100).toFixed(2)}%</p>
+                                </div>
 
-            <button onClick={addVariant}>Add Variant</button>
-            <button onClick={calculateSignificance}>Calculate</button>
-
-            {result && (
-                <div className="result">
-                    <h3>Results:</h3>
-                    <p>Your A/B test is statistically significant!</p>
-                    <p>Best Variant: Test &quot;{result.bestVariant.name}&quot; converted {result.bestImprovement}% better than Test &quot;{result.baseline.name}&quot;.</p>
-                    <p>
-                        I am {result.results.find(r => r.name === result.bestVariant.name)?.certainty}% certain that the changes in Test &quot;{result.bestVariant.name}&quot; will improve your conversion rate.
-                    </p>
-
-                    <h4>Detailed Comparison:</h4>
-                    {result.results.map(res => (
-                        <div key={res.name}>
-                            <p>Test &quot;{res.name}&quot; converted {res.improvement}% better than Test &quot;{result.baseline.name}&quot;.</p>
-                            <p>Certainty: {res.certainty}%</p>
+                            </div>
                         </div>
                     ))}
+
+                    <div className='mt-10'>
+                        <Button
+                            variant="outline"
+                            onClick={addVariant}
+                            className="mb-2 w-full">Add Variant</Button>
+                        <Button
+                            onClick={calculateSignificance}
+                            className="mb-2 w-full">Calculate</Button>
+                    </div>
                 </div>
-            )}
+
+                <div className="md:w-[40vw]">
+                    {result && (
+                        <div className="result">
+                            <h3 className="font-semibold text-xl mb-4">Results:</h3>
+                            <p className="font-medium text-lg mb-4">
+                                {result.isSignificant
+                                    ? "Your A/B test is statistically significant!"
+                                    : "Unfortunately, your results are not statistically significant."
+                                }
+                            </p>
+                            <p>
+                                Best Variant: Test &quot;{result.bestVariant.name}&quot; converted {result.bestImprovement}% better than Test &quot;{result.baseline.name}&quot;.
+                            </p>
+                            <p>
+                                I am {result.results[0].certainty} certain that the changes in Test &quot;{result.bestVariant.name}&quot; will improve your conversion rate.
+                            </p>
+
+                            <h4 className="mt-4">Detailed Comparison:</h4>
+                            {result.results.map(res => (
+                                <div key={res.name} className="mt-2">
+                                    <p>Test &quot;{res.name}&quot; converted {res.improvement}% better than Test &quot;{result.baseline.name}&quot;.</p>
+                                    <p>Certainty: {res.certainty}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
