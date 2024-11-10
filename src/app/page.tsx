@@ -1,10 +1,12 @@
-import HomePage from '@/components/pages/HomePage';
-import React from 'react';
+import React from "react";
+import HomePage from "@/components/pages/HomePage";
 
 const Home = () => {
   return (
     <div>
-      {/* <Banner header="SEO Assistant" desc="Get a detailed report on your site's SEO performance" /> */}
+      <div className="main">
+        <div className="gradient" />
+      </div>
       <HomePage />
     </div>
   );

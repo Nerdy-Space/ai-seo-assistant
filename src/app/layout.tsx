@@ -27,12 +27,18 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@1,900,700,500,300,400&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-blue-900 text-white flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-blue-800 text-white flex flex-col`}
       >
-          <Navbar />
-          {children}
-          <Footer />
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );

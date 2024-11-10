@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { auth } from "@/app/auth";
 import Image from "next/image";
-import Logout from "../auth/LogOut";
-
+import Logout from "@/components/auth/Logout";
 
 const Navbar = async () => {
   const session = await auth();
@@ -17,7 +16,7 @@ const Navbar = async () => {
           href="/ab-testing"
           legacyBehavior
           passHref
-          className="hover:text-blue-300"
+          className="hover:text-blue-300 transition-colors"
         >
           A/B Testing
         </Link>
@@ -45,8 +44,8 @@ const Navbar = async () => {
             <h2>{`${session?.user?.name}`}</h2>
             <Image
               className="rounded-xl"
-              src={session?.user?.image || ''}
-              alt={session?.user?.name || ''}
+              src={session?.user?.image || ""}
+              alt={session?.user?.name || ""}
               width={72}
               height={72}
             />
@@ -56,12 +55,11 @@ const Navbar = async () => {
       ) : (
         <div className="flex space-x-4">
           <Button
-            variant="outline"
-            className="bg-white text-blue-900 hover:bg-blue-100"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-colors"
           >
             Login
           </Button>
-          <Button className="bg-white text-blue-900 hover:bg-blue-100">
+          <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-colors">
             Get Started
           </Button>
         </div>

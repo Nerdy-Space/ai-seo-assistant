@@ -3,83 +3,125 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-blue-800 py-8">
+    <footer className="bg-gradient-to-t from-gray-900 to-transparent py-8">
       <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div>
-          <h3 className="font-bold mb-4">Company</h3>
+          <h3 className="font-bold mb-4 text-blue-300">Company</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 About Us
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Careers
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Contact
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h3 className="font-bold mb-4">Products</h3>
+          <h3 className="font-bold mb-4 text-blue-300">Products</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="#" className="hover:text-blue-300">
-                SEO Tool 1
+              <Link
+                href="/ab-testing"
+                legacyBehavior
+                passHref
+                className="hover:text-blue-300 transition-colors"
+              >
+                A/B Testing
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
-                SEO Tool 2
+              <Link
+                href="/open-graph-generator"
+                legacyBehavior
+                passHref
+                className="hover:text-blue-300"
+              >
+                OG Generator
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
-                SEO Tool 3
+              <Link
+                href="/google-index-checker"
+                legacyBehavior
+                passHref
+                className="hover:text-blue-300"
+              >
+                Google Index Checker
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h3 className="font-bold mb-4">Resources</h3>
+          <h3 className="font-bold mb-4 text-blue-300">Resources</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Blog
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Guides
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Webinars
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h3 className="font-bold mb-4">Legal</h3>
+          <h3 className="font-bold mb-4 text-blue-300">Legal</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Terms of Service
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-300">
+              <Link
+                href="#"
+                className="text-blue-100 hover:text-blue-300 transition-colors"
+              >
                 Cookie Policy
               </Link>
             </li>
