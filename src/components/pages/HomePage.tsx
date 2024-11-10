@@ -1,25 +1,10 @@
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import Link from "next/link"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-blue-900 text-white flex flex-col">
-      {/* Navbar */}
-      <nav className="container mx-auto px-4 py-6 flex items-center justify-between">
-        <div className="text-2xl font-bold">Logo</div>
-        <div className="hidden md:flex space-x-6">
-          <Link href="#" className="hover:text-blue-300">SEO Tool 1</Link>
-          <Link href="#" className="hover:text-blue-300">SEO Tool 2</Link>
-          <Link href="#" className="hover:text-blue-300">SEO Tool 3</Link>
-        </div>
-        <div className="flex space-x-4">
-          <Button variant="outline" className="bg-white text-blue-900 hover:bg-blue-100">Login</Button>
-          <Button className="bg-white text-blue-900 hover:bg-blue-100">Get Started</Button>
-        </div>
-      </nav>
-
+    <div>
       {/* Hero Section */}
       <main className="flex-grow container mx-auto px-4 py-12 flex flex-col items-center justify-center text-center">
         <Badge variant="secondary" className="mb-4 text-blue-900 bg-white px-3 py-1 text-sm">
