@@ -4,6 +4,7 @@ import Link from "next/link";
 import { auth } from "@/app/auth";
 import Image from "next/image";
 import Logout from "@/components/auth/Logout";
+import Login from "../auth/Login";
 
 const Navbar = async () => {
   const session = await auth();
@@ -54,11 +55,7 @@ const Navbar = async () => {
         </>
       ) : (
         <div className="flex space-x-4">
-          <Button
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-colors"
-          >
-            Login
-          </Button>
+          <Login />
           <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-colors">
             Get Started
           </Button>
