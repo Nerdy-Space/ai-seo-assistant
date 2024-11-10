@@ -35,7 +35,7 @@ const GraphGenerator = () => {
 
     return (
         <div className="flex gap-x-4 p-4 max-w-[1440px] mx-auto">
-            <div className="w-[50%]">
+            <div className="md:w-[60vw]">
                 <h2 className="font-semibold text-xl mb-4">Generate Open Graph Tags</h2>
 
                 <div className="mb-4">
@@ -85,7 +85,7 @@ const GraphGenerator = () => {
                 <Button onClick={generateTags}>Generate OG Tags</Button>
             </div>
 
-            <div className="w-[50%]">
+            <div className="md:w-[40vw]">
                 <h2 className="font-semibold text-xl mb-4">Generated OG Tags</h2>
                 {ogTags && (
                     <div>
