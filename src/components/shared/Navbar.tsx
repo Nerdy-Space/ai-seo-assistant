@@ -11,7 +11,11 @@ const Navbar = async () => {
 
   return (
     <nav className="container mx-auto px-4 py-6 flex items-center justify-between">
-      <div className="text-2xl font-bold">Logo</div>
+      <div className="text-2xl font-bold">
+        <Link href="/" legacyBehavior passHref>
+          Logo
+        </Link>
+      </div>
       <div className="hidden md:flex space-x-6">
         <Link
           href="/ab-testing"

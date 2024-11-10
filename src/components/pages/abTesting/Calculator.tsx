@@ -113,7 +113,7 @@ const Calculator: React.FC = () => {
 
 
     return (
-        <div className="max-w-[1440px] mx-auto px-4 pt-10">
+        <div className="container mx-auto px-4 pt-10 min-h-screen">
             <div className="flex gap-x-4">
                 <div className="md:w-[60vw]">
                     <h2 className="font-semibold text-xl mb-4">A/B Testing Significance Calculator</h2>

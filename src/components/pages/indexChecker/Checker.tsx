@@ -42,7 +42,7 @@ const Checker = () => {
     };
 
     return (
-        <div className="flex gap-x-4 p-4 max-w-[1440px] mx-auto">
+        <div className="flex gap-x-4 p-4 container mx-auto min-h-screen">
             <div className="md:w-[60vw]">
                 <h2 className="font-semibold text-xl mb-4">Google Index Checker</h2>
                 <div className="mb-4">
