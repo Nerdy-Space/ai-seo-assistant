@@ -1,17 +1,18 @@
+import Calculator from "@/components/pages/abTesting/Calculator";
 import React from "react";
-import Checker from "../../components/pages/indexChecker/Checker";
 import { auth } from "../auth";
 import { redirect } from "next/navigation";
 
-const GoogleIndexChecker = async () => {
+const page = async () => {
   const session = await auth();
 
   if (!session?.user) redirect("/");
+
   return (
-    <div>
-      <Checker />
-    </div>
+    <>
+      <Calculator />
+    </>
   );
 };
 
-export default GoogleIndexChecker;
+export default page;

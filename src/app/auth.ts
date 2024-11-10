@@ -9,8 +9,8 @@ export const {
 } = NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID_AUTH,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET_AUTH,
 
       authorization: {
         params: {

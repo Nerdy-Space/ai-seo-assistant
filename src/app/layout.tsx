@@ -4,9 +4,6 @@ import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 
-import { getSession } from "./auth";
-import Providers from "./providers";
-
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -28,18 +25,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-blue-900 text-white flex flex-col`}
       >
-        <Providers session={session}>
           <Navbar />
           {children}
           <Footer />
-        </Providers>
       </body>
     </html>
   );

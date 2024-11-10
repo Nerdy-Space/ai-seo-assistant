@@ -32,6 +32,9 @@ interface CalculationResult {
 }
 
 const Calculator: React.FC = () => {
+
+
+
     const [variants, setVariants] = useState<Variant[]>([
         { name: 'A', conversions: 90, visitors: 1000 },
         { name: 'B', conversions: 120, visitors: 1000 }
