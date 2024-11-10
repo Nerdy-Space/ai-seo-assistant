@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+// import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 
 const IndexChecker = () => {
@@ -11,19 +11,19 @@ const IndexChecker = () => {
     const [status, setStatus] = useState<string | null>(null);
 
     const checkGoogleIndex = async (url: string) => {
-        const googleAPIKey = process.env.GOOGLE_API_KEY; // Store API Key in environment variables
-        const cseID = process.env.GOOGLE_CLIENT_ID; 
+        // const googleAPIKey = process.env.GOOGLE_API_KEY; // Store API Key in environment variables
+        // const cseID = process.env.GOOGLE_CLIENT_ID; 
         try {
             const response = await axios.get('https://www.googleapis.com/customsearch/v1', {
                 params: {
-                    key: googleAPIKey,
-                    cx: cseID,
+                    key: "AIzaSyDL-_hcJVgTr882tQyzol37O8rVASB3Di8",
+                    cx: "614710ddc97744721",
                     q: url, // Search for the URL
                 },
             });
             console.log(response)
             if (response.status === 200) {
-                if (response.data.includes("did not match any documents")) {
+                if (Number(response.data.searchInformation.totalResults) < 1) {
                     setStatus("Not Indexed");
                 } else {
                     setStatus("Indexed");
@@ -59,7 +59,7 @@ const IndexChecker = () => {
                 <h2 className="font-semibold text-xl mb-4">Index Status</h2>
                 {status && (
                     <div>
-                        <Textarea value={status} readOnly rows={6} />
+                        <Button className={status === "Indexed" ? "bg-green-500" : "bg-red-500"}>{status}</Button>
                     </div>
                 )}
             </div>
