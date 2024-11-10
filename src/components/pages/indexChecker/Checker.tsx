@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 // import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 
-const IndexChecker = () => {
+const Checker = () => {
     const [url, setUrl] = useState("");
     const [status, setStatus] = useState<string | null>(null);
 
@@ -43,7 +43,7 @@ const IndexChecker = () => {
 
     return (
         <div className="flex gap-x-4 p-4 max-w-[1440px] mx-auto">
-            <div className="w-[50%]">
+            <div className="md:w-[60vw]">
                 <h2 className="font-semibold text-xl mb-4">Google Index Checker</h2>
                 <div className="mb-4">
                     <label className="block">Enter URL</label>
@@ -55,7 +55,7 @@ const IndexChecker = () => {
                 </div>
                 <Button onClick={handleCheckIndex}>Check Index Status</Button>
             </div>
-            <div className="w-[50%]">
+            <div className="md:w-[40vw]">
                 <h2 className="font-semibold text-xl mb-4">Index Status</h2>
                 {status && (
                     <div>
@@ -67,4 +67,4 @@ const IndexChecker = () => {
     );
 };
 
-export default IndexChecker;
+export default Checker;

@@ -158,9 +158,9 @@ const Calculator: React.FC = () => {
                 </div>
 
                 <div className="md:w-[40vw]">
+                    <h3 className="font-semibold text-xl mb-4">Results:</h3>
                     {result && (
-                        <div className="result">
-                            <h3 className="font-semibold text-xl mb-4">Results:</h3>
+                        <div className="result">                           
                             <p className="font-medium text-lg mb-4">
                                 {result.isSignificant
                                     ? "Your A/B test is statistically significant!"

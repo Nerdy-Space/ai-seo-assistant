@@ -1,5 +1,6 @@
-import Checker from '@/components/pages/indexChecker/Checker';
+
 import React from 'react';
+import Checker from '../../components/pages/indexChecker/Checker';
 
 const GoogleIndexChecker = () => {
     return (

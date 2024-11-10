@@ -1,4 +1,3 @@
-import Banner from '@/components/ui/Banner';
 import Calculator from '@/components/pages/abTesting/Calculator';
 import React from 'react';
 
