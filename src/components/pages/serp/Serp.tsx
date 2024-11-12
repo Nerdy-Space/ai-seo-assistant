@@ -24,7 +24,6 @@ const SerpChecker = () => {
     const [location, setLocation] = useState<string>("");
     const [dateRange, setDateRange] = useState<string>("");
     const [results, setResults] = useState<ApiResponse | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [resultsPerPage] = useState<number>(10);
     const [countries, setCountries] = useState<string[]>([]); // Holds country options
@@ -37,6 +36,7 @@ const SerpChecker = () => {
                 setCountries(response.data.map((country: any) => ({
                     code: country.cca2,
                     name: country.name.common,
+                })));
             } catch (error) {
                 console.error("Error fetching countries:", error);
             }
@@ -64,10 +64,8 @@ const SerpChecker = () => {
                 }
             );
             setResults(response.data);
-            setError(null); // Clear any previous errors
         } catch (error) {
             console.error("Error fetching data:", error);
-            setError("An error occurred while fetching the results. Please try again.");
         }
     };
 
@@ -78,10 +76,12 @@ const SerpChecker = () => {
     };
 
     return (
-        <div className="max-w-[1440px] mx-auto pt-10 px-4">            
+        <div className="max-w-[1440px] mx-auto pt-10 px-4">
+           
+            <div className="flex flex-col md:flex-row gap-6">
                 <div className="md:w-[60vw]">
                     {/* Search Query */}
-                    <div className="flex flex-col md:flex-row gap-6">
+                     <h2 className="font-semibold text-xl mb-4">SERP Checker</h2>
                     <div className="mb-4">
                         <label className="block">Search Query</label>
                         <Input
