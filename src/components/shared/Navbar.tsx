@@ -13,6 +13,9 @@ const Navbar = () => {
             <Link href="/google-index-checker" legacyBehavior passHref>
                 Google Index Checker
             </Link>
+            <Link href="/serp" legacyBehavior passHref>
+               SERP
+               </Link>
         </div>
     );
 };
