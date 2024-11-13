@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select"; // Assuming a Select component is available in your UI library
 import axios from "axios";
 
 // Define types for the API response
@@ -15,25 +14,37 @@ type SerpResult = {
 
 type ApiResponse = {
     organic: SerpResult[];
-    totalResults: number; // Assuming the API returns the total number of results
+    totalResults: number;
+};
+
+type Country = {
+    code: string;
+    name: string;
+};
+
+type Language = {
+    code: string;
+    name: string;
 };
 
 const SerpChecker = () => {
     const [search, setSearch] = useState<string>("");
-    const [country, setCountry] = useState<string>("US");
-    const [location, setLocation] = useState<string>("");
-    const [dateRange, setDateRange] = useState<string>("");
+    const [country, setCountry] = useState<string>("United States");
+    const [language, setLanguage] = useState<string>("");
+    const [device, setDevice] = useState<string>("desktop");
     const [results, setResults] = useState<ApiResponse | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [resultsPerPage] = useState<number>(10);
-    const [countries, setCountries] = useState<string[]>([]); // Holds country options
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [languages, setLanguages] = useState<Language[]>([]);
+    
 
     // Fetch country data
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const response = await axios.get("https://restcountries.com/v3.1/all"); // Example API
-                setCountries(response.data.map((country: any) => ({
+                const response = await axios.get("https://restcountries.com/v3.1/all");
+                setCountries(response.data.map((country: { cca2: string; name: { common: string } }) => ({
                     code: country.cca2,
                     name: country.name.common,
                 })));
@@ -44,26 +55,59 @@ const SerpChecker = () => {
         fetchCountries();
     }, []);
 
+    // Fetch language data
+    useEffect(() => {
+        const fetchLanguages = async () => {
+            try {
+                const response = await axios.get("https://libretranslate.com/languages"); // Example API
+                setLanguages(response.data.map((lang: { code: string; name: string }) => ({
+                    code: lang.code,
+                    name: lang.name,
+                })));
+            } catch (error) {
+                console.error("Error fetching languages:", error);
+            }
+        };
+        fetchLanguages();
+    }, []);
+
     // Fetch search results with pagination
     const handleSearch = async () => {
         try {
-            const response = await axios.post<ApiResponse>(
-                "https://google.serper.dev/search",
-                {
-                    q: search,
-                    location: location,
-                    gl: country,
-                    tbs: dateRange,
-                    start: (currentPage - 1) * resultsPerPage, // Pagination offset
+            const task_id = '02201650-1073-0066-2000-1d132bb28897';
+            const postRequest = await axios({
+                method: 'post',
+                url: `https://api.dataforseo.com/v3/serp/google/organic/task_post`,
+                auth: {
+                    username: 'aiman@outdated.digital',
+                    password: 'Shafi234@#'
                 },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-API-KEY": "02262635a723f488eb69ebcd461e62902067fc97",
-                    },
-                }
-            );
-            setResults(response.data);
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                data: [{
+                    keyword: search,
+                    location_name: country,
+                    device: device,
+                    language_name: language
+                }]
+            });
+            console.log(postRequest)
+
+            const response = await axios({
+                method: 'get',
+                url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${task_id}`,
+                auth: {
+                    username: 'aiman@outdated.digital',
+                    password: 'Shafi234@#'
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const result = response.data.tasks;
+            setResults(result);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -77,11 +121,10 @@ const SerpChecker = () => {
 
     return (
         <div className="max-w-[1440px] mx-auto pt-10 px-4">
-           
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="md:w-[60vw]">
                     {/* Search Query */}
-                     <h2 className="font-semibold text-xl mb-4">SERP Checker</h2>
+                    <h2 className="font-semibold text-xl mb-4">SERP Checker</h2>
                     <div className="mb-4">
                         <label className="block">Search Query</label>
                         <Input
@@ -100,37 +143,39 @@ const SerpChecker = () => {
                             className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
                         >
                             {countries.map((country) => (
-                                <option key={country.code} value={country.code}>
+                                <option key={country.code} value={country.name}>
                                     {country.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Location */}
+                    {/* Language Selection */}
                     <div className="mb-4">
-                        <label className="block">Location</label>
-                        <Input
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                            placeholder="Enter location (optional)"
-                        />
-                    </div>
-
-                    {/* Date Range */}
-                    <div className="mb-4">
-                        <label className="block">Date Range</label>
+                        <label className="block">Language</label>
                         <select
-                            value={dateRange}
-                            onChange={(e) => setDateRange(e.target.value)}
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value)}
                             className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
                         >
-                            <option value="">Any time</option>
-                            <option value="qdr:h">Past hour</option>
-                            <option value="qdr:d">Past 24 hours</option>
-                            <option value="qdr:w">Past week</option>
-                            <option value="qdr:m">Past month</option>
-                            <option value="qdr:y">Past year</option>
+                            {languages.map((lang) => (
+                                <option key={lang.code} value={lang.name}>
+                                    {lang.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Device Selection */}
+                    <div className="mb-4">
+                        <label className="block">Device</label>
+                        <select
+                            value={device}
+                            onChange={(e) => setDevice(e.target.value)}
+                            className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
+                        >
+                            <option value="desktop">Desktop</option>
+                            <option value="mobile">Mobile</option>
                         </select>
                     </div>
 
