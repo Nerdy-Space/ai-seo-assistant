@@ -37,7 +37,6 @@ const SerpChecker = () => {
     const [resultsPerPage] = useState<number>(10);
     const [countries, setCountries] = useState<Country[]>([]);
     const [languages, setLanguages] = useState<Language[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
     
 
     // Fetch country data
