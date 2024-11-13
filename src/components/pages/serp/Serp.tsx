@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select"; // Assuming a Select component is available in your UI library
 import axios from "axios";
 
 // Define types for the API response
@@ -17,6 +16,11 @@ type ApiResponse = {
     organic: SerpResult[];
     totalResults: number; // Assuming the API returns the total number of results
 };
+type Country = {
+    code: string;
+    name: string;
+};
+
 
 const SerpChecker = () => {
     const [search, setSearch] = useState<string>("");
@@ -26,14 +30,14 @@ const SerpChecker = () => {
     const [results, setResults] = useState<ApiResponse | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [resultsPerPage] = useState<number>(10);
-    const [countries, setCountries] = useState<string[]>([]); // Holds country options
+    const [countries, setCountries] = useState<Country[]>([]);
 
     // Fetch country data
     useEffect(() => {
         const fetchCountries = async () => {
             try {
                 const response = await axios.get("https://restcountries.com/v3.1/all"); // Example API
-                setCountries(response.data.map((country: any) => ({
+                setCountries(response.data.map((country: { cca2: string; name: { common: string } }) => ({
                     code: country.cca2,
                     name: country.name.common,
                 })));
@@ -77,11 +81,11 @@ const SerpChecker = () => {
 
     return (
         <div className="max-w-[1440px] mx-auto pt-10 px-4">
-           
+
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="md:w-[60vw]">
                     {/* Search Query */}
-                     <h2 className="font-semibold text-xl mb-4">SERP Checker</h2>
+                    <h2 className="font-semibold text-xl mb-4">SERP Checker</h2>
                     <div className="mb-4">
                         <label className="block">Search Query</label>
                         <Input
