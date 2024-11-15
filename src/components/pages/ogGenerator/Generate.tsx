@@ -5,8 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const GraphGenerator = () => {
+    const { isSignedIn } = useUser();
+    const router = useRouter();
+    useEffect(() => {
+        // Redirect to the sign-in page if the user is not signed in
+        if (!isSignedIn) {
+            router.push("/");  // Replace "/sign-in" with your sign-in page route
+        }
+    }, [isSignedIn, router]);
     const [title, setTitle] = useState("");
     const [type, setType] = useState("");
     const [description, setDescription] = useState("");
@@ -39,7 +49,7 @@ const GraphGenerator = () => {
     };
 
     return (
-        <div className="max-w-[1440px] mx-auto pt-10">
+        <div className="max-w-[1440px] mx-auto pt-10 px-4 md:px-10">
             <div className="flex flex-col md:flex-row gap-6 ">
                 {/* Input Section */}
                 <div className="md:w-[60vw]">

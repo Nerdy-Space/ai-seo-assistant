@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 // Define types for the API response
 type SerpResult = {
@@ -28,6 +30,15 @@ type Language = {
 };
 
 const SerpChecker = () => {
+    const { isSignedIn } = useUser();
+    const router = useRouter();
+    useEffect(() => {
+        // Redirect to the sign-in page if the user is not signed in
+        if (!isSignedIn) {
+            router.push("/");  // Replace "/sign-in" with your sign-in page route
+        }
+    }, [isSignedIn, router]);
+    
     const [search, setSearch] = useState<string>("");
     const [country, setCountry] = useState<string>("United States");
     const [language, setLanguage] = useState<string>("");
@@ -120,7 +131,7 @@ const SerpChecker = () => {
     };
 
     return (
-        <div className="max-w-[1440px] mx-auto pt-10 px-4">
+        <div className="max-w-[1440px] mx-auto pt-10 px-4 md:px-10">
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="md:w-[60vw]">
                     {/* Search Query */}
