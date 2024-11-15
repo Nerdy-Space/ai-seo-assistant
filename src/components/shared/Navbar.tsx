@@ -46,14 +46,14 @@ const Navbar = () => {
 
       {/* Mobile Menu Toggle */}
       <div className="md:hidden">
-        <button onClick={toggleMenu} className="focus:outline-none">
+        <button onClick={toggleMenu} className="focus:outline-none z-[100]">
           {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex flex-col items-center space-y-6 pt-20 text-white md:hidden">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-70 flex flex-col items-center space-y-6 pt-20 text-white md:hidden z-[1000]">
           <Link href="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
           <button className="flex items-center gap-x-2 focus:outline-none" onClick={toggleDropdown}>
             Tools <FiChevronDown />

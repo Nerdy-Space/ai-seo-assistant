@@ -11,10 +11,10 @@ const Banner = () => {
 
             <div className='flex flex-col items-center text-center'>
                 {/* Header with slight shadow */}
-                <h2 className="text-3xl md:text-5xl font-extrabold text-[#1F2937] mb-3 drop-shadow-md">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-[#1F2937] mb-3 drop-shadow-md z-[-1]">
                     AI SEO Assistant
                 </h2>
-                <h2 className="text-3xl md:text-5xl font-extrabold text-[#1F2937] mb-6 drop-shadow-md">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-[#1F2937] mb-6 drop-shadow-md z-[-1]">
                     The Only Tool You&apos;ll Need
                 </h2>
 
