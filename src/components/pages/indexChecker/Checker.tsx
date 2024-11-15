@@ -1,11 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const Checker = () => {
+    const { isSignedIn } = useUser();
+    const router = useRouter();
+    useEffect(() => {
+        // Redirect to the sign-in page if the user is not signed in
+        if (!isSignedIn) {
+            router.push("/");  // Replace "/sign-in" with your sign-in page route
+        }
+    }, [isSignedIn, router]);
+
     const [url, setUrl] = useState("");
     const [status, setStatus] = useState<string | null>(null);
 
@@ -41,7 +52,7 @@ const Checker = () => {
     };
 
     return (
-        <div className="flex gap-x-4 p-4 max-w-[1440px] mx-auto pt-10">
+        <div className="flex gap-x-4 p-4 max-w-[1440px] mx-auto pt-10 px-4 md:px-10">
             <div className="md:w-[60vw]">
                 <h2 className="font-semibold text-xl mb-4">Google Index Checker</h2>
                 <div className="mb-4">

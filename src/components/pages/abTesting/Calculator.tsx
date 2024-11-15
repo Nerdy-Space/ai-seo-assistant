@@ -1,7 +1,9 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 interface Variant {
     name: string;
@@ -32,6 +34,14 @@ interface CalculationResult {
 }
 
 const Calculator: React.FC = () => {
+    const { isSignedIn } = useUser();
+    const router = useRouter();
+    useEffect(() => {
+        // Redirect to the sign-in page if the user is not signed in
+        if (!isSignedIn) {
+            router.push("/");  // Replace "/sign-in" with your sign-in page route
+        }
+    }, [isSignedIn, router]);
     const [variants, setVariants] = useState<Variant[]>([
         { name: 'A', conversions: 90, visitors: 1000 },
         { name: 'B', conversions: 120, visitors: 1000 }
