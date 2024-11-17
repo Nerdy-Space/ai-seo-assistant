@@ -32,13 +32,13 @@ type Language = {
 const SerpChecker = () => {
     const { isSignedIn } = useUser();
     const router = useRouter();
+
     useEffect(() => {
-        // Redirect to the sign-in page if the user is not signed in
         if (!isSignedIn) {
-            router.push("/");  // Replace "/sign-in" with your sign-in page route
+            router.push("/"); // Redirect to the sign-in page if not signed in
         }
     }, [isSignedIn, router]);
-    
+
     const [search, setSearch] = useState<string>("");
     const [country, setCountry] = useState<string>("United States");
     const [language, setLanguage] = useState<string>("");
@@ -48,7 +48,6 @@ const SerpChecker = () => {
     const [resultsPerPage] = useState<number>(10);
     const [countries, setCountries] = useState<Country[]>([]);
     const [languages, setLanguages] = useState<Language[]>([]);
-    
 
     // Fetch country data
     useEffect(() => {
@@ -103,7 +102,6 @@ const SerpChecker = () => {
                     language_name: language
                 }]
             });
-            console.log(postRequest)
 
             const response = await axios({
                 method: 'get',
@@ -124,34 +122,51 @@ const SerpChecker = () => {
         }
     };
 
-    // Handle pagination
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        handleSearch();
+    // Get the current page's results
+    const getPagedResults = () => {
+        if (!results) return [];
+        const startIndex = (currentPage - 1) * resultsPerPage;
+        const endIndex = startIndex + resultsPerPage;
+        return results.organic.slice(startIndex, endIndex);
     };
 
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    // Calculate total number of pages
+    const totalPages = results ? Math.ceil(results.totalResults / resultsPerPage) : 0;
+
     return (
-        <div className="max-w-[1440px] mx-auto pt-10 px-4 md:px-10">
-            <div className="flex flex-col md:flex-row gap-6">
-                <div className="md:w-[60vw]">
-                    {/* Search Query */}
-                    <h2 className="font-semibold text-xl mb-4">SERP Checker</h2>
-                    <div className="mb-4">
-                        <label className="block">Search Query</label>
+        <div className="max-w-[1440px] mx-auto px-4 pt-10 pb-16">
+            <div className="relative p-6 bg-white shadow-md rounded-lg">
+                {/* Grid Background with Radial Gradient */}
+                <div className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
+                    <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_600px_at_50%_200px,#C9EBFF,transparent)] opacity-90"></div>
+                </div>
+
+                <h2 className="text-3xl font-bold text-[#1F2937] mb-6 text-center drop-shadow-md">
+                    SERP Checker Tool
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Search Query</h3>
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Enter your search query"
+                            placeholder="Enter search keyword"
+                            className="w-full bg-[#fff]"
                         />
                     </div>
 
-                    {/* Country Selection */}
-                    <div className="mb-4">
-                        <label className="block">Country</label>
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Select Country</h3>
                         <select
                             value={country}
                             onChange={(e) => setCountry(e.target.value)}
-                            className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
+                            className="w-full p-2 border rounded-lg"
                         >
                             {countries.map((country) => (
                                 <option key={country.code} value={country.name}>
@@ -161,87 +176,92 @@ const SerpChecker = () => {
                         </select>
                     </div>
 
-                    {/* Language Selection */}
-                    <div className="mb-4">
-                        <label className="block">Language</label>
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Select Language</h3>
                         <select
                             value={language}
                             onChange={(e) => setLanguage(e.target.value)}
-                            className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
+                            className="w-full p-2 border rounded-lg"
                         >
                             {languages.map((lang) => (
-                                <option key={lang.code} value={lang.name}>
+                                <option key={lang.code} value={lang.code}>
                                     {lang.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Device Selection */}
-                    <div className="mb-4">
-                        <label className="block">Device</label>
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Device</h3>
                         <select
                             value={device}
                             onChange={(e) => setDevice(e.target.value)}
-                            className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
+                            className="w-full p-2 border rounded-lg"
                         >
                             <option value="desktop">Desktop</option>
                             <option value="mobile">Mobile</option>
                         </select>
                     </div>
+                </div>
 
-                    {/* Search Button */}
-                    <Button onClick={handleSearch} className="w-full md:w-auto">
-                        Check SERP
+                <div className="mt-8 space-y-4">
+                    <Button
+                        onClick={handleSearch}
+                        className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
+                    >
+                        Search
                     </Button>
                 </div>
 
                 {/* Results Section */}
-                <div className="md:w-[40vw]">
-                    <h2 className="font-semibold text-xl mb-4">Search Results ({results?.organic ? results.organic.length : 0})</h2>
-                    {results ? (
-                        <div className="bg-gray-100 p-4 rounded">
-                            {results.organic && results.organic.length > 0 ? (
-                                results.organic.map((result, index) => (
-                                    <div key={index} className="mb-4">
-                                        <a
-                                            href={result.link}
-                                            className="text-blue-500 font-semibold"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {result.title}
-                                        </a>
-                                        <p className="text-gray-600">{result.snippet}</p>
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No results found.</p>
-                            )}
-                        </div>
-                    ) : (
-                        <p>Enter search criteria and click Check SERP to view results.</p>
-                    )}
+                {results && results.organic.length > 0 && (
+                    <div className="mt-10 bg-gray-50 p-6 rounded-lg shadow-inner">
+                        <h4 className="font-medium text-gray-800 mb-4">
+                            Total Results: {results.totalResults}
+                        </h4>
+                        {getPagedResults().map((result, index) => (
+                            <div key={index} className="mb-4 p-4 bg-white rounded-lg shadow-sm">
+                                <h5 className="font-semibold text-lg text-blue-600">{result.title}</h5>
+                                <p className="text-gray-700 mb-2">{result.snippet}</p>
+                                <a
+                                    href={result.link}
+                                    className="text-blue-500 hover:underline"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    View Full Result
+                                </a>
+                            </div>
+                        ))}
 
-                    {/* Pagination */}
-                    {results && results.totalResults > 10 && (
-                        <div className="mt-4">
+                        {/* Pagination Controls */}
+                        <div className="flex justify-between mt-6">
                             <Button
-                                onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
+                                onClick={() => handlePageChange(currentPage - 1)}
                             >
                                 Previous
                             </Button>
-                            <span className="mx-2">{currentPage}</span>
+                            <div className="flex space-x-2">
+                                {Array.from({ length: totalPages }, (_, index) => (
+                                    <Button
+                                        key={index}
+                                        onClick={() => handlePageChange(index + 1)}
+                                        className={currentPage === index + 1 ? "bg-blue-500 text-white" : ""}
+                                    >
+                                        {index + 1}
+                                    </Button>
+                                ))}
+                            </div>
                             <Button
+                                disabled={currentPage === totalPages}
                                 onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={results.totalResults <= currentPage * resultsPerPage}
                             >
                                 Next
                             </Button>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

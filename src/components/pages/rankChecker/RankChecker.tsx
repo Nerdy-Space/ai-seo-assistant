@@ -10,12 +10,13 @@ import { useRouter } from "next/navigation";
 const Checker = () => {
     const { isSignedIn } = useUser();
     const router = useRouter();
+
     useEffect(() => {
-        // Redirect to the sign-in page if the user is not signed in
         if (!isSignedIn) {
-            router.push("/");  // Replace "/sign-in" with your sign-in page route
+            router.push("/"); // Redirect to the home or sign-in page
         }
     }, [isSignedIn, router]);
+
     const [url, setUrl] = useState("");
     const [results, setResults] = useState(null);
 
@@ -23,10 +24,7 @@ const Checker = () => {
         try {
             const response = await axios.post(
                 "https://google.serper.dev/search",
-                {
-                    q: url,
-                    // engine: 'google'
-                },
+                { q: url },
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -40,8 +38,6 @@ const Checker = () => {
         }
     };
 
-    console.log(results)
-
     const handleCheckIndex = async () => {
         if (url) {
             handleSearch(url);
@@ -49,26 +45,50 @@ const Checker = () => {
     };
 
     return (
-        <div className="flex gap-x-4 p-4 max-w-[1440px] mx-auto pt-10 px-4 md:px-10">
-            <div className="md:w-[60vw]">
-                <h2 className="font-semibold text-xl mb-4">Google Rank Checker</h2>
-                <div className="mb-4">
-                    <label className="block">Enter URL</label>
-                    <Input
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="Enter page URL"
-                    />
+        <div className="max-w-[1440px] mx-auto px-4 pt-10 pb-16">
+            <div className="relative p-6 bg-white shadow-md rounded-lg">
+                {/* Grid Background with Radial Gradient */}
+                <div className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
+                    <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_600px_at_50%_200px,#C9EBFF,transparent)] opacity-90"></div>
                 </div>
-                <Button onClick={handleCheckIndex}>Check Rank</Button>
-            </div>
-            <div className="md:w-[40vw]">
-                <h2 className="font-semibold text-xl mb-4">Search Result</h2>
-                {/* {status && (
-                    <div>
-                        <Button className={status === "Indexed" ? "bg-green-500" : "bg-red-500"}>{status}</Button>
+
+                <h2 className="text-3xl font-bold text-[#1F2937] mb-6 text-center drop-shadow-md">
+                    Google Rank Checker
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Enter URL</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <Input
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                    placeholder="Enter page URL"
+                                    className="w-full"
+                                />
+                            </div>
+                            <Button
+                                onClick={handleCheckIndex}
+                                className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
+                            >
+                                Check Rank
+                            </Button>
+                        </div>
                     </div>
-                )} */}
+                </div>
+
+                {results && (
+                    <div className="mt-10 bg-gray-50 p-6 rounded-lg shadow-inner">
+                        <h4 className="font-medium text-gray-800 mb-4">Search Result</h4>
+                        <p className="text-gray-700 mb-2">
+                            {/* Status: {results?.status || "No data"} */}
+                        </p>
+                        <p className="text-gray-700">
+                            {/* Position: {results?.position || "N/A"} */}
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );
