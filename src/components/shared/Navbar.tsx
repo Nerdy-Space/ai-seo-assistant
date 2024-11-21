@@ -50,6 +50,7 @@ const Navbar = () => {
                 <Link href="/ab-testing" className="block px-4 py-2 hover:bg-gray-100">A/B Testing</Link>
                 <Link href="/open-graph-generator" className="block px-4 py-2 hover:bg-gray-100">OG Generator</Link>
                 <Link href="/google-index-checker" className="block px-4 py-2 hover:bg-gray-100">Google Index Checker</Link>
+                <Link href="/single-article" className="block px-4 py-2 hover:bg-gray-100">AI Article</Link>
                 <Link href="/serp" className="block px-4 py-2 hover:bg-gray-100">SERP</Link>
                 <Link href="/google-rank-checker" className="block px-4 py-2 hover:bg-gray-100">Google Rank Checker</Link>
               </div>
@@ -88,6 +89,7 @@ const Navbar = () => {
                 <Link href="/google-index-checker" onClick={() => setIsMenuOpen(false)}>Google Index Checker</Link>
                 <Link href="/serp" onClick={() => setIsMenuOpen(false)}>SERP</Link>
                 <Link href="/google-rank-checker" onClick={() => setIsMenuOpen(false)}>Google Rank Checker</Link>
+                <Link href="/single-article" onClick={() => setIsMenuOpen(false)}>AI Article</Link>
               </div>
             )}
 

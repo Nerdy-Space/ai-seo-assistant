@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
     domains: ["encrypted-tbn0.gstatic.com"], // Add the hostname here
   },
