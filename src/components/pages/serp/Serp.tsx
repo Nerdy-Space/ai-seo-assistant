@@ -3,21 +3,25 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Table } from "@/components/ui/table";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"; // Import js-cookie
+import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
 
 // Define types for the API response
 type SerpResult = {
-    link: string;
+    type: string;
+    rank_group: number;
+    rank_absolute: number;
+    domain: string;
     title: string;
-    snippet: string;
+    description: string;
+    url: string;
+    breadcrumb: string;
 };
 
-type ApiResponse = {
-    organic: SerpResult[];
-    totalResults: number;
-};
 
 type Country = {
     code: string;
@@ -43,11 +47,12 @@ const SerpChecker = () => {
     const [country, setCountry] = useState<string>("United States");
     const [language, setLanguage] = useState<string>("");
     const [device, setDevice] = useState<string>("desktop");
-    const [results, setResults] = useState<ApiResponse | null>(null);
+    const [results, setResults] = useState<SerpResult[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [resultsPerPage] = useState<number>(10);
     const [countries, setCountries] = useState<Country[]>([]);
     const [languages, setLanguages] = useState<Language[]>([]);
+    const [loading, setLoading] = useState<boolean>(false); // For loader state
 
     // Fetch country data
     useEffect(() => {
@@ -84,13 +89,14 @@ const SerpChecker = () => {
     // Fetch search results with pagination
     const handleSearch = async () => {
         try {
-            const task_id = '02201650-1073-0066-2000-1d132bb28897';
+            setLoading(true); // Show loader when search starts
+            // Post request to create task
             const postRequest = await axios({
                 method: 'post',
                 url: `https://api.dataforseo.com/v3/serp/google/organic/task_post`,
                 auth: {
                     username: 'aiman@outdated.digital',
-                    password: 'Shafi234@#'
+                    password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
                 },
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,35 +105,65 @@ const SerpChecker = () => {
                     keyword: search,
                     location_name: country,
                     device: device,
-                    language_name: language
+                    language_name: "English",
+                    priority: 2
                 }]
             });
 
+            const taskId = postRequest.data.tasks[0].id;
+            // Store the task ID in cookies for 1 day
+            Cookies.set('taskId', taskId, { expires: 1 });
+
+            let taskReady = false;
+
+            // Check task readiness every 2 minutes
+            while (!taskReady) {
+                await new Promise(resolve => setTimeout(resolve, 120)); // Wait 2 minutes
+                const checkTaskReady = await axios({
+                    method: 'get',
+                    url: `https://api.dataforseo.com/v3/serp/google/organic/tasks_ready`,
+                    auth: {
+                        username: 'aiman@outdated.digital',
+                        password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
+                    },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const taskIdsReady = checkTaskReady.data.tasks.map((task: { id: string }) => task.id);
+                if (taskIdsReady.includes(taskId)) {
+                    taskReady = true;
+                }
+            }
+
+            // Once task is ready, fetch the results
             const response = await axios({
                 method: 'get',
-                url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${task_id}`,
+                url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${taskId}`,
                 auth: {
                     username: 'aiman@outdated.digital',
-                    password: 'Shafi234@#'
+                    password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
                 },
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
-            const result = response.data.tasks;
-            setResults(result);
+            console.log(response.data)
+            setResults(response.data.tasks[0].result[0].items); // Set results
+            setLoading(false); // Hide loader when data is fetched
         } catch (error) {
             console.error("Error fetching data:", error);
+            setLoading(false); // Hide loader on error
         }
     };
 
     // Get the current page's results
     const getPagedResults = () => {
-        if (!results) return [];
         const startIndex = (currentPage - 1) * resultsPerPage;
         const endIndex = startIndex + resultsPerPage;
-        return results.organic.slice(startIndex, endIndex);
+        return results.slice(startIndex, endIndex);
     };
 
     // Handle page change
@@ -136,16 +172,11 @@ const SerpChecker = () => {
     };
 
     // Calculate total number of pages
-    const totalPages = results ? Math.ceil(results.totalResults / resultsPerPage) : 0;
+    const totalPages = results ? Math.ceil(results.length / resultsPerPage) : 0;
 
     return (
         <div className="max-w-[1440px] mx-auto px-4 pt-10 pb-16">
             <div className="relative p-6 bg-white shadow-md rounded-lg">
-                {/* Grid Background with Radial Gradient */}
-                <div className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
-                    <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_600px_at_50%_200px,#C9EBFF,transparent)] opacity-90"></div>
-                </div>
-
                 <h2 className="text-3xl font-bold text-[#1F2937] mb-6 text-center drop-shadow-md">
                     SERP Checker Tool
                 </h2>
@@ -213,55 +244,84 @@ const SerpChecker = () => {
                     </Button>
                 </div>
 
-                {/* Results Section */}
-                {results && results.organic.length > 0 && (
-                    <div className="mt-10 bg-gray-50 p-6 rounded-lg shadow-inner">
-                        <h4 className="font-medium text-gray-800 mb-4">
-                            Total Results: {results.totalResults}
-                        </h4>
-                        {getPagedResults().map((result, index) => (
-                            <div key={index} className="mb-4 p-4 bg-white rounded-lg shadow-sm">
-                                <h5 className="font-semibold text-lg text-blue-600">{result.title}</h5>
-                                <p className="text-gray-700 mb-2">{result.snippet}</p>
-                                <a
-                                    href={result.link}
-                                    className="text-blue-500 hover:underline"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    View Full Result
-                                </a>
-                            </div>
-                        ))}
-
-                        {/* Pagination Controls */}
-                        <div className="flex justify-between mt-6">
-                            <Button
-                                disabled={currentPage === 1}
-                                onClick={() => handlePageChange(currentPage - 1)}
-                            >
-                                Previous
-                            </Button>
-                            <div className="flex space-x-2">
-                                {Array.from({ length: totalPages }, (_, index) => (
-                                    <Button
-                                        key={index}
-                                        onClick={() => handlePageChange(index + 1)}
-                                        className={currentPage === index + 1 ? "bg-blue-500 text-white" : ""}
-                                    >
-                                        {index + 1}
-                                    </Button>
-                                ))}
-                            </div>
-                            <Button
-                                disabled={currentPage === totalPages}
-                                onClick={() => handlePageChange(currentPage + 1)}
-                            >
-                                Next
-                            </Button>
-                        </div>
+                {/* Show Loader */}
+                {loading && (
+                    <div className="mt-6 text-center">
+                        <div className="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto"></div>
+                        <p className="mt-2 text-sm text-gray-500">It might take a few minutes</p>
                     </div>
                 )}
+
+
+                {/* Results Section */}
+                {!loading && results && results.length > 0 && (
+          <div className="mt-10 bg-gray-50 p-6 rounded-lg shadow-inner">
+            <h4 className="font-medium text-gray-800 mb-4">Total Results: {results.length}</h4>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="p-3 text-left font-semibold text-gray-600">Rank</th>
+                    <th className="p-3 text-left font-semibold text-gray-600">Title</th>
+                    <th className="p-3 text-left font-semibold text-gray-600">Domain</th>
+                    <th className="p-3 text-left font-semibold text-gray-600">URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getPagedResults().map((result, index) => (
+                    <tr
+                      key={index}
+                      className={`border-b border-gray-200 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors duration-150`}
+                    >
+                      <td className="p-3 text-gray-800">{result.rank_absolute}</td>
+                      <td className="p-3 text-gray-800 font-medium">{result.title}</td>
+                      <td className="p-3 text-gray-600">{result.domain}</td>
+                      <td className="p-3 text-blue-600 hover:text-blue-800">
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center"
+                        >
+                          <span className="truncate max-w-xs">{result.url}</span>
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="flex justify-between items-center mt-6">
+              <div className="text-sm text-gray-600">
+                Showing {(currentPage - 1) * resultsPerPage + 1} to{" "}
+                {Math.min(currentPage * resultsPerPage, results.length)} of {results.length} results
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
             </div>
         </div>
     );

@@ -23,14 +23,6 @@ const Banner = () => {
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempora, similique dicta modi placeat deserunt dolorem labore quod et earum quae.
                 </p>
 
-                {/* Decorative Icons
-                <div className="flex justify-center gap-8 mb-8">
-                    <AiOutlineRobot className="text-4xl text-[#3B82F6] opacity-75" />
-                    <AiOutlineLineChart className="text-4xl text-[#3B82F6] opacity-75" />
-                    <AiOutlineCloud className="text-4xl text-[#3B82F6] opacity-75" />
-                </div> */}
-
-                {/* Call-to-Action Button */}
                 <button className="bg-[#3B82F6] text-white text-sm md:text-base py-3 px-8 rounded-full shadow-md transition duration-300 transform hover:bg-[#2563EB] hover:shadow-lg hover:scale-105 mb-4">
                     Try Now
                 </button>
