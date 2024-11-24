@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Copy, CheckCircle, ImageIcon, Download } from 'lucide-react';
+import { Loader2, Copy, CheckCircle, Download } from 'lucide-react';
 import OpenAI from "openai";
 import {
     Select,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select"
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const GenerateArticle = () => {
 
@@ -337,7 +338,10 @@ const GenerateArticle = () => {
                                 </Button>
                             </div>
                             <div className="rounded-lg overflow-hidden">
-                                <img src={generatedImage} alt="Generated content" className="w-full h-auto" />
+                                <Image
+                                width={500}
+                                height={500}
+                                    src={generatedImage} alt="Generated content" className="w-full h-auto" />
                             </div>
                         </div>
                     )}

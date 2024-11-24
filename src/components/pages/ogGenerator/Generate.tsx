@@ -38,7 +38,7 @@ const GraphGenerator = () => {
 
     useEffect(() => {
         generateTags();
-    }, []);
+    });
 
     const handleCopy = () => {
         if (ogTags) {
