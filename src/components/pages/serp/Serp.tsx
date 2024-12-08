@@ -4,18 +4,24 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"; // Import js-cookie
+import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+import Cookies from "js-cookie";
 
 // Define types for the API response
 type SerpResult = {
-    link: string;
+    type: string;
+    rank_group: number;
+    rank_absolute: number;
+    domain: string;
     title: string;
-    snippet: string;
+    description: string;
+    url: string;
+    breadcrumb: string;
 };
 
-type ApiResponse = {
-    organic: SerpResult[];
-    totalResults: number;
-};
 
 type Country = {
     code: string;
@@ -28,16 +34,25 @@ type Language = {
 };
 
 const SerpChecker = () => {
+    const { isSignedIn } = useUser();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isSignedIn) {
+            router.push("/"); // Redirect to the sign-in page if not signed in
+        }
+    }, [isSignedIn, router]);
+
     const [search, setSearch] = useState<string>("");
     const [country, setCountry] = useState<string>("United States");
     const [language, setLanguage] = useState<string>("");
     const [device, setDevice] = useState<string>("desktop");
-    const [results, setResults] = useState<ApiResponse | null>(null);
+    const [results, setResults] = useState<SerpResult[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [resultsPerPage] = useState<number>(10);
     const [countries, setCountries] = useState<Country[]>([]);
     const [languages, setLanguages] = useState<Language[]>([]);
-    
+    const [loading, setLoading] = useState<boolean>(false); // For loader state
 
     // Fetch country data
     useEffect(() => {
@@ -73,14 +88,17 @@ const SerpChecker = () => {
 
     // Fetch search results with pagination
     const handleSearch = async () => {
+        const serpCount = parseInt(Cookies.get("SERP") || "0", 10);
+        Cookies.set("SERP", (serpCount + 1).toString());
         try {
-            const task_id = '02201650-1073-0066-2000-1d132bb28897';
+            setLoading(true); // Show loader when search starts
+            // Post request to create task
             const postRequest = await axios({
                 method: 'post',
                 url: `https://api.dataforseo.com/v3/serp/google/organic/task_post`,
                 auth: {
                     username: 'aiman@outdated.digital',
-                    password: 'Shafi234@#'
+                    password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
                 },
                 headers: {
                     'Content-Type': 'application/json',
@@ -89,58 +107,99 @@ const SerpChecker = () => {
                     keyword: search,
                     location_name: country,
                     device: device,
-                    language_name: language
+                    language_name: "English",
+                    priority: 2
                 }]
             });
-            console.log(postRequest)
 
+            const taskId = postRequest.data.tasks[0].id;
+            // Store the task ID in cookies for 1 day
+            Cookies.set('taskId', taskId, { expires: 1 });
+
+            let taskReady = false;
+
+            // Check task readiness every 2 minutes
+            while (!taskReady) {
+                await new Promise(resolve => setTimeout(resolve, 120)); // Wait 2 minutes
+                const checkTaskReady = await axios({
+                    method: 'get',
+                    url: `https://api.dataforseo.com/v3/serp/google/organic/tasks_ready`,
+                    auth: {
+                        username: 'aiman@outdated.digital',
+                        password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
+                    },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const taskIdsReady = checkTaskReady.data.tasks.map((task: { id: string }) => task.id);
+                if (taskIdsReady.includes(taskId)) {
+                    taskReady = true;
+                }
+            }
+
+            // Once task is ready, fetch the results
             const response = await axios({
                 method: 'get',
-                url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${task_id}`,
+                url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${taskId}`,
                 auth: {
                     username: 'aiman@outdated.digital',
-                    password: 'Shafi234@#'
+                    password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
                 },
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
-            const result = response.data.tasks;
-            setResults(result);
+            console.log(response.data)
+            setResults(response.data.tasks[0].result[0].items); // Set results
+            setLoading(false); // Hide loader when data is fetched
         } catch (error) {
             console.error("Error fetching data:", error);
+            setLoading(false); // Hide loader on error
         }
     };
 
-    // Handle pagination
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        handleSearch();
+    // Get the current page's results
+    const getPagedResults = () => {
+        const startIndex = (currentPage - 1) * resultsPerPage;
+        const endIndex = startIndex + resultsPerPage;
+        return results.slice(startIndex, endIndex);
     };
 
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    // Calculate total number of pages
+    const totalPages = results ? Math.ceil(results.length / resultsPerPage) : 0;
+
     return (
-        <div className="max-w-[1440px] mx-auto pt-10 px-4">
-            <div className="flex flex-col md:flex-row gap-6">
-                <div className="md:w-[60vw]">
-                    {/* Search Query */}
-                    <h2 className="font-semibold text-xl mb-4">SERP Checker</h2>
-                    <div className="mb-4">
-                        <label className="block">Search Query</label>
+        <div className="max-w-[1440px] mx-auto px-4 pt-10 pb-16">
+            <div className="relative p-6 bg-white shadow-md rounded-lg">
+                <h2 className="text-3xl font-bold text-[#1F2937] mb-6 text-center drop-shadow-md">
+                    SERP Checker Tool
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Search Query</h3>
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Enter your search query"
+                            placeholder="Enter search keyword"
+                            className="w-full bg-[#fff]"
                         />
                     </div>
 
-                    {/* Country Selection */}
-                    <div className="mb-4">
-                        <label className="block">Country</label>
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Select Country</h3>
                         <select
                             value={country}
                             onChange={(e) => setCountry(e.target.value)}
-                            className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
+                            className="w-full p-2 border rounded-lg"
                         >
                             {countries.map((country) => (
                                 <option key={country.code} value={country.name}>
@@ -150,87 +209,121 @@ const SerpChecker = () => {
                         </select>
                     </div>
 
-                    {/* Language Selection */}
-                    <div className="mb-4">
-                        <label className="block">Language</label>
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Select Language</h3>
                         <select
                             value={language}
                             onChange={(e) => setLanguage(e.target.value)}
-                            className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
+                            className="w-full p-2 border rounded-lg"
                         >
                             {languages.map((lang) => (
-                                <option key={lang.code} value={lang.name}>
+                                <option key={lang.code} value={lang.code}>
                                     {lang.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Device Selection */}
-                    <div className="mb-4">
-                        <label className="block">Device</label>
+                    <div className="p-4 bg-gray-100 rounded-lg shadow-sm">
+                        <h3 className="text-lg font-semibold mb-2">Device</h3>
                         <select
                             value={device}
                             onChange={(e) => setDevice(e.target.value)}
-                            className="border-[1px] border-[#ddd] p-2 rounded-lg w-full"
+                            className="w-full p-2 border rounded-lg"
                         >
                             <option value="desktop">Desktop</option>
                             <option value="mobile">Mobile</option>
                         </select>
                     </div>
+                </div>
 
-                    {/* Search Button */}
-                    <Button onClick={handleSearch} className="w-full md:w-auto">
-                        Check SERP
+                <div className="mt-8 space-y-4">
+                    <Button
+                        onClick={handleSearch}
+                        className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
+                    >
+                        Search
                     </Button>
                 </div>
 
-                {/* Results Section */}
-                <div className="md:w-[40vw]">
-                    <h2 className="font-semibold text-xl mb-4">Search Results ({results?.organic ? results.organic.length : 0})</h2>
-                    {results ? (
-                        <div className="bg-gray-100 p-4 rounded">
-                            {results.organic && results.organic.length > 0 ? (
-                                results.organic.map((result, index) => (
-                                    <div key={index} className="mb-4">
-                                        <a
-                                            href={result.link}
-                                            className="text-blue-500 font-semibold"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {result.title}
-                                        </a>
-                                        <p className="text-gray-600">{result.snippet}</p>
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No results found.</p>
-                            )}
-                        </div>
-                    ) : (
-                        <p>Enter search criteria and click Check SERP to view results.</p>
-                    )}
+                {/* Show Loader */}
+                {loading && (
+                    <div className="mt-6 text-center">
+                        <div className="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto"></div>
+                        <p className="mt-2 text-sm text-gray-500">It might take a few minutes</p>
+                    </div>
+                )}
 
-                    {/* Pagination */}
-                    {results && results.totalResults > 10 && (
-                        <div className="mt-4">
-                            <Button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            >
-                                Previous
-                            </Button>
-                            <span className="mx-2">{currentPage}</span>
-                            <Button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={results.totalResults <= currentPage * resultsPerPage}
-                            >
-                                Next
-                            </Button>
-                        </div>
-                    )}
-                </div>
+
+                {/* Results Section */}
+                {!loading && results && results.length > 0 && (
+          <div className="mt-10 bg-gray-50 p-6 rounded-lg shadow-inner">
+            <h4 className="font-medium text-gray-800 mb-4">Total Results: {results.length}</h4>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="p-3 text-left font-semibold text-gray-600">Rank</th>
+                    <th className="p-3 text-left font-semibold text-gray-600">Title</th>
+                    <th className="p-3 text-left font-semibold text-gray-600">Domain</th>
+                    <th className="p-3 text-left font-semibold text-gray-600">URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getPagedResults().map((result, index) => (
+                    <tr
+                      key={index}
+                      className={`border-b border-gray-200 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors duration-150`}
+                    >
+                      <td className="p-3 text-gray-800">{result.rank_absolute}</td>
+                      <td className="p-3 text-gray-800 font-medium">{result.title}</td>
+                      <td className="p-3 text-gray-600">{result.domain}</td>
+                      <td className="p-3 text-blue-600 hover:text-blue-800">
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center"
+                        >
+                          <span className="truncate max-w-xs">{result.url}</span>
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="flex justify-between items-center mt-6">
+              <div className="text-sm text-gray-600">
+                Showing {(currentPage - 1) * resultsPerPage + 1} to{" "}
+                {Math.min(currentPage * resultsPerPage, results.length)} of {results.length} results
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
             </div>
         </div>
     );
