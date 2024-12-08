@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"
 
 const Checker = () => {
     const { isSignedIn } = useUser();
@@ -21,6 +22,8 @@ const Checker = () => {
     const [status, setStatus] = useState<string | null>(null);
 
     const checkGoogleIndex = async (url: string) => {
+        const count = parseInt(Cookies.get("Google Index Checker") || "0", 10);
+        Cookies.set("Google Index Checker", (count + 1).toString());
         try {
             const response = await axios.get("https://www.googleapis.com/customsearch/v1", {
                 params: {

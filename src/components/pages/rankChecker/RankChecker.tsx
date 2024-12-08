@@ -22,8 +22,8 @@ const Checker = () => {
     const [results, setResults] = useState(null);
 
     const handleSearch = async (url: string) => {
-        const rankCount = parseInt(Cookies.get("rankChecker") || "0", 10); // Get current count or default to 0
-    Cookies.set("rankChecker", rankCount + 1); // Increment and update
+        const rankCount = parseInt(Cookies.get("Google Rank Checker") || "0", 10); 
+        Cookies.set("Google Rank Checker", (rankCount + 1).toString());
         try {
             const response = await axios.post(
                 "https://google.serper.dev/search",

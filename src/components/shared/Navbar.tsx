@@ -64,7 +64,12 @@ const Navbar = () => {
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            <UserButton />
+            <div className="flex items-center gap-x-4">
+              <Link href="/dashboard">
+                <button className="px-4 py-2 rounded">Dashboard</button>
+              </Link>
+              <UserButton />
+            </div>
           </SignedIn>
         </div>
 
@@ -100,6 +105,9 @@ const Navbar = () => {
               </SignInButton>
             </SignedOut>
             <SignedIn>
+              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                <button className="px-4 py-2 rounded">Dashboard</button>
+              </Link>
               <UserButton />
             </SignedIn>
           </div>

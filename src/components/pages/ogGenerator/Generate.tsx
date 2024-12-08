@@ -25,9 +25,17 @@ const GraphGenerator = () => {
     const [url, setUrl] = useState("");
     const [ogTags, setOgTags] = useState("");
 
+    // Initialize tag count on mount, only if it doesn't already exist
+    useEffect(() => {
+        const tagCount = parseInt(Cookies.get("OG Tag Generator") || "0", 10);
+        Cookies.set("OG Tag Generator", tagCount.toString()); // Ensure no unnecessary increments happen on mount
+    }, []);
+
     const generateTags = () => {
-         const tagCount = parseInt(Cookies.get("ogGenerator") || "0", 10); // Get current count or default to 0
-    Cookies.set("ogGenerator", tagCount + 1); // Increment and update
+        // Get current count (no increase on initial mount)
+        const tagCount = parseInt(Cookies.get("OG Tag Generator") || "0", 10);
+
+        // Construct OG tags using form data
         const generatedTags = `
             <meta property="og:title" content="${title || 'Demo Title'}" />
             <meta property="og:type" content="${type || 'website'}" />
@@ -37,11 +45,10 @@ const GraphGenerator = () => {
         `.replace(/^\s+/gm, "");
 
         setOgTags(generatedTags);
-    };
 
-    useEffect(() => {
-        generateTags();
-    });
+        // Optionally, increment tag count only on button click, if needed
+        Cookies.set("OG Tag Generator", (tagCount + 1).toString());
+    };
 
     const handleCopy = () => {
         if (ogTags) {
@@ -120,7 +127,7 @@ const GraphGenerator = () => {
                         </div>
 
                         <Button
-                            onClick={generateTags}
+                            onClick={generateTags} // Trigger generateTags on click
                             className="w-full bg-[#3B82F6] text-white hover:bg-[#2563EB]"
                         >
                             Generate OG Tags

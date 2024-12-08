@@ -86,9 +86,9 @@ const GenerateArticle = () => {
         return `Create a blog post about ${formData.topics}. Write it in a standard, ${formData.tone} tone. Use transition words. Use active voice. Write over ${formData.length} words. Use very creative titles for the blog post. Add a title for each section. Ensure there are a minimum of ${formData.sections} sections. Each section should have a minimum of two paragraphs. Include the following keywords: "${formData.keywords}". Create a good slug for this post and a meta description with a maximum of 100 words and add it to the end of the blog post.`;
     };
 
-    const handleGenerate = async () => {
-          const aiCount = parseInt(Cookies.get("aiArticle") || "0", 10); // Get current count or default to 0
-    Cookies.set("aiArticle", aiCount + 1); // Increment and update
+    const handleGenerate = async () => {        
+        const aiCount = parseInt(Cookies.get("AI Article") || "0", 10);
+        Cookies.set("AI Article", (aiCount + 1).toString());
         try {
             setLoading(true);
             const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });

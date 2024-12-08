@@ -88,8 +88,8 @@ const SerpChecker = () => {
 
     // Fetch search results with pagination
     const handleSearch = async () => {
-          const serpCount = parseInt(Cookies.get("serp") || "0", 10); // Get current count or default to 0
-    Cookies.set("serp", serpCount + 1); // Increment and update
+        const serpCount = parseInt(Cookies.get("SERP") || "0", 10);
+        Cookies.set("SERP", (serpCount + 1).toString());
         try {
             setLoading(true); // Show loader when search starts
             // Post request to create task

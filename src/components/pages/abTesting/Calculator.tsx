@@ -70,8 +70,8 @@ const Calculator: React.FC = () => {
     };
 
     const calculateSignificance = () => {
-        const abTestingCount = parseInt(Cookies.get("abTesting") || "0", 10); // Get current count or default to 0
-    Cookies.set("abTesting", abTestingCount + 1); // Increment and update
+        const abTestingCount = parseInt(Cookies.get("AB Testing") || "0", 10); // Get current count or default to 0
+        Cookies.set("AB Testing", (abTestingCount + 1).toString()); // Increment and update (convert to string before setting)
 
     
         const parsedVariants: ParsedVariant[] = variants.map((variant) => ({
