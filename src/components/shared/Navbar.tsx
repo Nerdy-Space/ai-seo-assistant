@@ -32,7 +32,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="py-6 px-10 bg-[#f4fafd] shadow-lg">
+    <div className="py-6 px-10 bg-[#f4fafd] ">
       <div className="max-w-[1440px] flex items-center justify-between mx-auto">
         <Link href="/" className="text-3xl font-bold">
           AI Assistant

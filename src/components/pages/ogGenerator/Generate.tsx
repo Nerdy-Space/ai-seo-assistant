@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const GraphGenerator = () => {
     const { isSignedIn } = useUser();
@@ -25,6 +26,8 @@ const GraphGenerator = () => {
     const [ogTags, setOgTags] = useState("");
 
     const generateTags = () => {
+         const tagCount = parseInt(Cookies.get("ogGenerator") || "0", 10); // Get current count or default to 0
+    Cookies.set("ogGenerator", tagCount + 1); // Increment and update
         const generatedTags = `
             <meta property="og:title" content="${title || 'Demo Title'}" />
             <meta property="og:type" content="${type || 'website'}" />

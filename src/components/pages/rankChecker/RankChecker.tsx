@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const Checker = () => {
     const { isSignedIn } = useUser();
@@ -21,6 +22,8 @@ const Checker = () => {
     const [results, setResults] = useState(null);
 
     const handleSearch = async (url: string) => {
+        const rankCount = parseInt(Cookies.get("rankChecker") || "0", 10); // Get current count or default to 0
+    Cookies.set("rankChecker", rankCount + 1); // Increment and update
         try {
             const response = await axios.post(
                 "https://google.serper.dev/search",

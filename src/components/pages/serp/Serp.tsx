@@ -8,6 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie"; // Import js-cookie
 import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+import Cookies from "js-cookie";
 
 // Define types for the API response
 type SerpResult = {
@@ -87,6 +88,8 @@ const SerpChecker = () => {
 
     // Fetch search results with pagination
     const handleSearch = async () => {
+          const serpCount = parseInt(Cookies.get("serp") || "0", 10); // Get current count or default to 0
+    Cookies.set("serp", serpCount + 1); // Increment and update
         try {
             setLoading(true); // Show loader when search starts
             // Post request to create task

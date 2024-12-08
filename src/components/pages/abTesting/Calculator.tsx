@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 interface Variant {
     name: string;
@@ -69,6 +70,10 @@ const Calculator: React.FC = () => {
     };
 
     const calculateSignificance = () => {
+        const abTestingCount = parseInt(Cookies.get("abTesting") || "0", 10); // Get current count or default to 0
+    Cookies.set("abTesting", abTestingCount + 1); // Increment and update
+
+    
         const parsedVariants: ParsedVariant[] = variants.map((variant) => ({
             name: variant.name,
             conversions: variant.conversions,
@@ -134,6 +139,8 @@ const Calculator: React.FC = () => {
         });
     };
 
+
+    
     return (
         <div className="max-w-[1440px] mx-auto px-4 pt-10 pb-16">
             <div className="relative p-6 bg-white shadow-md rounded-lg">

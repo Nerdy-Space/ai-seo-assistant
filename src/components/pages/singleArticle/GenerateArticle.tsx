@@ -15,6 +15,7 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Cookies from "js-cookie";
 
 const GenerateArticle = () => {
 
@@ -86,6 +87,8 @@ const GenerateArticle = () => {
     };
 
     const handleGenerate = async () => {
+          const aiCount = parseInt(Cookies.get("aiArticle") || "0", 10); // Get current count or default to 0
+    Cookies.set("aiArticle", aiCount + 1); // Increment and update
         try {
             setLoading(true);
             const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
