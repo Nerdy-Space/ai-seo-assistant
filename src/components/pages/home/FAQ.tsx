@@ -19,7 +19,7 @@ const FAQ = () => {
             <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
                 <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_600px_at_50%_200px,#C9EBFF,transparent)] opacity-90"></div>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-[#1F2937] mb-8">Frequently Asked Questions</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-[#F5A622] mb-8">Frequently Asked Questions</h2>
             <div className="space-y-4">
                 {faqs.map((faq, index) => (
                     <div key={index} className="border-b border-[#E5E7EB] pb-4">

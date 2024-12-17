@@ -11,10 +11,10 @@ const Banner = () => {
 
             <div className='flex flex-col items-center text-center'>
                 {/* Header with slight shadow */}
-                <h2 className="text-3xl md:text-5xl font-extrabold text-[#1F2937] mb-3 drop-shadow-md z-[-1]">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-[#3059E3] mb-3 drop-shadow-md z-[-1]">
                     AI SEO Assistant
                 </h2>
-                <h2 className="text-3xl md:text-5xl font-extrabold text-[#1F2937] mb-6 drop-shadow-md z-[-1]">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-[#3059E3] mb-6 drop-shadow-md z-[-1]">
                     The Only Tool You&apos;ll Need
                 </h2>
 
@@ -23,7 +23,7 @@ const Banner = () => {
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempora, similique dicta modi placeat deserunt dolorem labore quod et earum quae.
                 </p>
 
-                <button className="bg-[#3B82F6] text-white text-sm md:text-base py-3 px-8 rounded-full shadow-md transition duration-300 transform hover:bg-[#2563EB] hover:shadow-lg hover:scale-105 mb-4">
+                <button className="bg-[#F5A622] text-white text-sm md:text-base py-3 px-8 rounded-full shadow-md transition duration-300 transform hover:bg-[#2563EB] hover:shadow-lg hover:scale-105 mb-4">
                     Try Now
                 </button>
 

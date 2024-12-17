@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram } from 'react-icons/fa';
+import Image from "next/image";
 
 const Footer = () => {
     return (
@@ -9,7 +10,7 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* About Section */}
                     <div className="flex flex-col items-start">
-                        <h3 className="text-xl font-semibold text-[#1F2937] mb-4">AI SEO Assistant</h3>
+                         <Image src="https://i.ibb.co.com/Rgq4TBm/image.png" alt="Logo" width={120} height={100} className="mb-4"/>
                         <p className="text-sm text-[#6B7280]">
                             Your go-to tool for optimizing your website&apos;s SEO with advanced AI insights and recommendations.
                         </p>
@@ -17,7 +18,7 @@ const Footer = () => {
 
                     {/* Links Section */}
                     <div className="flex flex-col items-start">
-                        <h3 className="text-xl font-semibold text-[#1F2937] mb-4">Quick Links</h3>
+                        <h3 className="text-xl font-semibold text-[#F5A622] mb-4">Quick Links</h3>
                         <ul className="space-y-2 text-sm text-[#6B7280]">
                             <li><a href="/about" className="hover:text-[#3B82F6]">About Us</a></li>
                             <li><a href="/features" className="hover:text-[#3B82F6]">Features</a></li>
@@ -29,7 +30,7 @@ const Footer = () => {
 
                     {/* Social Media Section */}
                     <div className="flex flex-col items-start">
-                        <h3 className="text-xl font-semibold text-[#1F2937] mb-4">Follow Us</h3>
+                        <h3 className="text-xl font-semibold text-[#F5A622] mb-4">Follow Us</h3>
                         <div className="flex space-x-4">
                             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#3B82F6] hover:text-[#1F2937]">
                                 <FaFacebookF size={20} />

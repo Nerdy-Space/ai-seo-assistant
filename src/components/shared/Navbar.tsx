@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import Image from "next/image";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,8 +35,8 @@ const Navbar = () => {
   return (
     <div className="py-6 px-10 bg-[#f4fafd] ">
       <div className="max-w-[1440px] flex items-center justify-between mx-auto">
-        <Link href="/" className="text-3xl font-bold">
-          AI Assistant
+        <Link href="/">
+          <Image src="https://i.ibb.co.com/Rgq4TBm/image.png" alt="Logo" width={120} height={100} />
         </Link>
 
         {/* Desktop Menu */}
