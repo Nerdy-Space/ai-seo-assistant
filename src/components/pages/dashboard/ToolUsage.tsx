@@ -1,55 +1,55 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import Cookies from "js-cookie"
-import { Activity, Globe, Search, FileSearch, Bot, BarChart } from 'lucide-react'
+// import { useEffect, useState } from "react"
+// // import Cookies from "js-cookie"
+// import { Activity, Globe, Search, FileSearch, Bot, BarChart } from 'lucide-react'
 
-// Map tools to their respective icons
-const toolIcons = {
-    "AB Testing": Activity,
-    "Google Index Checker": Globe,
-    "Google Rank Checker": Search,
-    "OG Tag Generator": FileSearch,
-    "AI Article": Bot,
-    "SERP": BarChart,
-}
+// // Map tools to their respective icons
+// const toolIcons = {
+//     "AB Testing": Activity,
+//     "Google Index Checker": Globe,
+//     "Google Rank Checker": Search,
+//     "OG Tag Generator": FileSearch,
+//     "AI Article": Bot,
+//     "SERP": BarChart,
+// }
 
 export default function DashboardHome() {
-    const [toolUsage, setToolUsage] = useState<{ [key: string]: number }>({})
-    const [totalUses, setTotalUses] = useState(0)
+    // const [toolUsage, setToolUsage] = useState<{ [key: string]: number }>({})
+    // const [totalUses, setTotalUses] = useState(0)
 
-    useEffect(() => {
-        const tools = [
-            "AB Testing",
-            "Google Index Checker",
-            "Google Rank Checker",
-            "OG Tag Generator",
-            "AI Article",
-            "SERP",
-        ]
+    // useEffect(() => {
+    //     const tools = [
+    //         "AB Testing",
+    //         "Google Index Checker",
+    //         "Google Rank Checker",
+    //         "OG Tag Generator",
+    //         "AI Article",
+    //         "SERP",
+    //     ]
 
-        const usageData: { [key: string]: number } = {}
-        let total = 0
+    //     const usageData: { [key: string]: number } = {}
+    //     let total = 0
 
-        tools.forEach((tool) => {
-            const toolCount = Cookies.get(tool) ? parseInt(Cookies.get(tool)!, 10) : 0
-            usageData[tool] = toolCount
-            total += toolCount
-        })
+        // tools.forEach((tool) => {
+        //     const toolCount = Cookies.get(tool) ? parseInt(Cookies.get(tool)!, 10) : 0
+        //     usageData[tool] = toolCount
+        //     total += toolCount
+        // })
 
-        setToolUsage(usageData)
-        setTotalUses(total)
-    }, [])
+        // setToolUsage(usageData)
+        // setTotalUses(total)
+    // }, [])
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
             <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-900">Tool Usage</h2>
                 <p className="mt-2 text-sm text-gray-600">
-                    Total uses across all tools: {totalUses}
+                    Total uses across all tools: 0
                 </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {Object.entries(toolUsage).map(([tool, count]) => {
                     const IconComponent = toolIcons[tool as keyof typeof toolIcons]
                     const percentage = ((count / Math.max(totalUses, 1)) * 100).toFixed(1)
@@ -74,7 +74,7 @@ export default function DashboardHome() {
                         </div>
                     )
                 })}
-            </div>
+            </div> */}
         </div>
     )
 }

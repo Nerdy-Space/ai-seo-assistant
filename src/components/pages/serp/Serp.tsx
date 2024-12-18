@@ -8,7 +8,6 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie"; // Import js-cookie
 import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
-import Cookies from "js-cookie";
 
 // Define types for the API response
 type SerpResult = {
