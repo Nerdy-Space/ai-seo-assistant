@@ -9,14 +9,16 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie"
 
 const Checker = () => {
-    const { isSignedIn } = useUser();
+    const { isLoaded, isSignedIn } = useUser();
     const router = useRouter();
 
-    useEffect(() => {
-        if (!isSignedIn) {
-            router.push("/"); // Redirect to the home or sign-in page if not signed in
-        }
-    }, [isSignedIn, router]);
+   
+       useEffect(() => {
+           if (!isLoaded) return; // Wait until the user state is loaded
+           if (!isSignedIn) {
+               router.push("/"); // Redirect to sign-in if not signed in
+           }
+       }, [isLoaded, isSignedIn, router]);
 
     const [url, setUrl] = useState("");
     const [status, setStatus] = useState<string | null>(null);
@@ -51,6 +53,15 @@ const Checker = () => {
             checkGoogleIndex(url);
         }
     };
+
+    if (!isLoaded || !isSignedIn) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="w-16 h-16 border-4 border-t-4 border-blue-500 rounded-full animate-spin"></div>
+                <p className="ml-4 text-blue-500">Loading user session...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center p-6 max-w-4xl mx-auto">

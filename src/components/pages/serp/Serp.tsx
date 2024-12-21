@@ -33,14 +33,15 @@ type Language = {
 };
 
 const SerpChecker = () => {
-    const { isSignedIn } = useUser();
+    const { isLoaded, isSignedIn, user } = useUser();
     const router = useRouter();
 
     useEffect(() => {
+        if (!isLoaded) return; // Wait until the user state is loaded
         if (!isSignedIn) {
-            router.push("/"); // Redirect to the sign-in page if not signed in
+            router.push("/"); // Redirect to sign-in if not signed in
         }
-    }, [isSignedIn, router]);
+    }, [isLoaded, isSignedIn, router]);
 
     const [search, setSearch] = useState<string>("");
     const [country, setCountry] = useState<string>("United States");
@@ -94,7 +95,7 @@ const SerpChecker = () => {
             // Post request to create task
             const postRequest = await axios({
                 method: 'post',
-                url: `https://api.dataforseo.com/v3/serp/google/organic/task_post`,
+                url: `https://api.dataforseo.com/v3/serp/google/organic/live/advanced`,
                 auth: {
                     username: 'aiman@outdated.digital',
                     password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
@@ -107,9 +108,12 @@ const SerpChecker = () => {
                     location_name: country,
                     device: device,
                     language_name: "English",
-                    priority: 2
+                    priority: 2, 
+                    depth: 20
                 }]
             });
+
+            console.log(postRequest)
 
             const taskId = postRequest.data.tasks[0].id;
             // Store the task ID in cookies for 1 day
@@ -118,41 +122,41 @@ const SerpChecker = () => {
             let taskReady = false;
 
             // Check task readiness every 2 minutes
-            while (!taskReady) {
-                await new Promise(resolve => setTimeout(resolve, 120)); // Wait 2 minutes
-                const checkTaskReady = await axios({
-                    method: 'get',
-                    url: `https://api.dataforseo.com/v3/serp/google/organic/tasks_ready`,
-                    auth: {
-                        username: 'aiman@outdated.digital',
-                        password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
-                    },
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+            // while (!taskReady) {
+            //     await new Promise(resolve => setTimeout(resolve, 120)); // Wait 2 minutes
+            //     const checkTaskReady = await axios({
+            //         method: 'get',
+            //         url: `https://api.dataforseo.com/v3/serp/google/organic/tasks_ready`,
+            //         auth: {
+            //             username: 'aiman@outdated.digital',
+            //             password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
+            //         },
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //         },
+            //     });
 
-                const taskIdsReady = checkTaskReady.data.tasks.map((task: { id: string }) => task.id);
-                if (taskIdsReady.includes(taskId)) {
-                    taskReady = true;
-                }
-            }
+            //     const taskIdsReady = checkTaskReady.data.tasks.map((task: { id: string }) => task.id);
+            //     if (taskIdsReady.includes(taskId)) {
+            //         taskReady = true;
+            //     }
+            // }
 
             // Once task is ready, fetch the results
-            const response = await axios({
-                method: 'get',
-                url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${taskId}`,
-                auth: {
-                    username: 'aiman@outdated.digital',
-                    password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
-                },
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            // const response = await axios({
+            //     method: 'get',
+            //     url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${taskId}`,
+            //     auth: {
+            //         username: 'aiman@outdated.digital',
+            //         password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
+            //     },
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            // });
 
-            console.log(response.data)
-            setResults(response.data.tasks[0].result[0].items); // Set results
+            // console.log(response.data)
+            // setResults(response.data.tasks[0].result[0].items); // Set results
             setLoading(false); // Hide loader when data is fetched
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -175,6 +179,15 @@ const SerpChecker = () => {
     // Calculate total number of pages
     const totalPages = results ? Math.ceil(results.length / resultsPerPage) : 0;
 
+    if (!isLoaded || !isSignedIn) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="w-16 h-16 border-4 border-t-4 border-blue-500 rounded-full animate-spin"></div>
+                <p className="ml-4 text-blue-500">Loading user session...</p>
+            </div>
+        );
+    }
+    
     return (
         <div className="max-w-[1440px] mx-auto px-4 pt-10 pb-16">
             <div className="relative p-6 bg-white shadow-md rounded-lg">

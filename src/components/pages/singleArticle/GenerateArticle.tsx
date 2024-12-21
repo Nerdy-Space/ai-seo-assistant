@@ -18,15 +18,15 @@ import Image from "next/image";
 import Cookies from "js-cookie";
 
 const GenerateArticle = () => {
-
-    const { isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
     const router = useRouter();
+
     useEffect(() => {
-        // Redirect to the sign-in page if the user is not signed in
+        if (!isLoaded) return; // Wait until the user state is loaded
         if (!isSignedIn) {
-            router.push("/");  // Replace "/sign-in" with your sign-in page route
+            router.push("/"); // Redirect to sign-in if not signed in
         }
-    }, [isSignedIn, router]);
+    }, [isLoaded, isSignedIn, router]);
 
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -107,6 +107,7 @@ const GenerateArticle = () => {
                 ],
             });
 
+            console.log(completion.choices[0].message.content)
             const content = completion.choices[0].message.content || "";
             const titleMatch = content.match(/Title: "(.*?)"/);
             const slugMatch = content.match(/Slug: (.*?)\n/);
@@ -185,6 +186,17 @@ const GenerateArticle = () => {
         { value: "optimistic", label: "Optimistic" },
         { value: "witty", label: "Witty" },
     ]
+
+
+    if (!isLoaded || !isSignedIn) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="w-16 h-16 border-4 border-t-4 border-blue-500 rounded-full animate-spin"></div>
+                <p className="ml-4 text-blue-500">Loading user session...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-[1440px] mx-auto py-10 px-4 md:px-10">
             <h1 className="text-4xl font-bold text-center mb-10">Advanced Content Generator</h1>
