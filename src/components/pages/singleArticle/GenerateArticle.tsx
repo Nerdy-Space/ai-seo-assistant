@@ -20,6 +20,18 @@ import Cookies from "js-cookie";
 const GenerateArticle = () => {
   const { isLoaded, isSignedIn, user } = useUser();
     const router = useRouter();
+    const loaderTexts = [
+  "Something great is cooking...",
+  "A legendary content is about to be born...",
+  "Unleashing the power of words...",
+  "Crafting a masterpiece just for you...",
+  "Stirring the cauldron of creativity...",
+  "Weaving a tapestry of brilliant ideas...",
+  "Summoning the muses of inspiration...",
+  "Brewing a potion of engaging content...",
+  "Unlocking the secrets of captivating writing...",
+  "Channeling the spirit of wordsmith wizards..."
+];
 
     useEffect(() => {
         if (!isLoaded) return; // Wait until the user state is loaded
@@ -47,6 +59,7 @@ const GenerateArticle = () => {
     const [generateImage, setGenerateImage] = useState(false);
     const [generatedImage, setGeneratedImage] = useState("");
     const [imageSize, setImageSize] = useState("1024x1024");
+    const [loaderText, setLoaderText] = useState("");
 
     const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCurrentKeyword(e.target.value);
@@ -90,41 +103,37 @@ const GenerateArticle = () => {
         const aiCount = parseInt(Cookies.get("AI Article") || "0", 10);
         Cookies.set("AI Article", (aiCount + 1).toString());
         try {
-            setLoading(true);
-            const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+  setLoading(true);
+  let currentTextIndex = 0;
+  const loaderTextInterval = setInterval(() => {
+      setLoaderText(loaderTexts[currentTextIndex]);
+      currentTextIndex = (currentTextIndex + 1) % loaderTexts.length;
+    }, 3000);
 
-            const completion = await openai.chat.completions.create({
-                model: "gpt-4",
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are a professional content writer.",
-                    },
-                    {
-                        role: "user",
-                        content: generatePrompt(),
-                    },
-                ],
-            });
+  const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
 
-            console.log(completion.choices[0].message.content)
-            const content = completion.choices[0].message.content || "";
-            const titleMatch = content.match(/Title: "(.*?)"/);
-            const slugMatch = content.match(/Slug: (.*?)\n/);
-            const metaDescriptionMatch = content.match(/Meta Description: (.*?)\n/i);
-            const cleanedContent = content
-                .replace(/Title: ".*?"/, "")
-                .replace(/Slug: .*?\n/, "")
-                .replace(/Meta Description: .*?\n/i, "");
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      { role: "system", content: "You are a professional content writer." },
+      { role: "user", content: generatePrompt() },
+    ],
+  });
 
-            setGeneratedContent({
-                title: titleMatch ? titleMatch[1] : "Untitled",
-                content: cleanedContent.trim(),
-                slug: slugMatch ? slugMatch[1] : "",
-                metaDescription: metaDescriptionMatch ? metaDescriptionMatch[1] : "",
-            });
+  clearInterval(loaderTextInterval);
 
-            if (generateImage) {
+  const content = completion.choices[0].message.content || "";
+  const titleMatch = content.match(/Title: "(.*?)"/);
+  const slugMatch = content.match(/Slug: (.*?)\n/);
+  const metaDescriptionMatch = content.match(/Meta Description: (.*?)\n/i);
+
+  const cleanedContent = content
+    .replace(/Title: ".*?"/, "")
+    .replace(/Slug: .*?\n/, "")
+    .replace(/Meta Description: .*?\n/i, "")
+   .replace(/(Section \d+)/gi, "<strong>$1</strong>");
+
+   if (generateImage) {
                 const imageResponse = await openai.images.generate({
                     model: "dall-e-3",
                     prompt: `Create a high-quality, detailed image related to ${formData.topics}`,
@@ -133,11 +142,23 @@ const GenerateArticle = () => {
                 });
                 setGeneratedImage(imageResponse.data[0].url || "");
             }
-        } catch (error) {
-            console.error("Error generating content:", error);
-        } finally {
-            setLoading(false);
-        }
+
+  setGeneratedContent({
+    title: titleMatch ? titleMatch[1] : "Untitled",
+    content: cleanedContent.trim(),
+    slug: slugMatch ? slugMatch[1] : "",
+    metaDescription: metaDescriptionMatch ? metaDescriptionMatch[1] : "",
+  });
+
+  
+
+} catch (error) {
+  console.error("Error generating content:", error);
+} finally {
+  setLoading(false);
+  setLoaderText("");
+}
+
     };
 
     const handleCopy = () => {
@@ -328,17 +349,14 @@ const GenerateArticle = () => {
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold rounded-lg transition duration-300 ease-in-out"
                             disabled={loading}
                         >
-                            {loading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                    Generating...
-                                </>
-                            ) : (
-                                "Generate Content"
-                            )}
+                          Generate Content
                         </Button>
                     </div>
-                    {generateImage && generatedImage && (
+                    {loading ? (
+                                <div className="flex flex-col gap-y-2 justify-center items-center w-full h-full">
+                                    <Loader2 className="h-12 w-12 animate-spin" color="#3059E3"/>
+                                </div>
+                            ): generateImage && generatedImage && (
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-2xl font-bold">Generated Image</h2>
@@ -362,7 +380,13 @@ const GenerateArticle = () => {
                     )}
                 </div>
                 <div className="space-y-8">
-                    {generatedContent && (
+                    
+                    {loading ? (
+                                <div className="flex flex-col gap-y-2 justify-center items-center w-full h-full">
+                                    <Loader2 className="h-12 w-12 animate-spin" color="#3059E3"/>
+                                   <p className="text-md text-[#333]"> {loaderText || "Generating..."}</p>
+                                </div>
+                            ) : generatedContent && (
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-2xl font-bold">Generated Content</h2>
@@ -381,14 +405,20 @@ const GenerateArticle = () => {
                                 </Button>
                             </div>
                             <div className="prose max-w-none">
-                                <h1 className="text-3xl font-bold mb-4">{generatedContent.title}</h1>
-                                <div dangerouslySetInnerHTML={{ __html: generatedContent.content.replace(/\n/g, '<br />') }} />
-                                <div className="mt-4">
-                                    <h3 className="text-xl font-semibold">Slug:</h3>
+                                <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+                                    <h3 className="text-xl font-semibold mb-2">Title:</h3>
+                                    <p className="text-3xl font-bold">{generatedContent.title}</p>
+                                </div>
+                                <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+          <h3 className="text-xl font-semibold mb-2">Content:</h3>
+          <div dangerouslySetInnerHTML={{ __html: generatedContent.content.replace(/\n/g, '<br />') }} />
+        </div>
+                                <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+                                    <h3 className="text-xl font-semibold mb-2">Slug:</h3>
                                     <p>{generatedContent.slug}</p>
                                 </div>
-                                <div className="mt-4">
-                                    <h3 className="text-xl font-semibold">Meta Description:</h3>
+                                <div className="p-4 bg-gray-100 rounded-lg">
+                                    <h3 className="text-xl font-semibold mb-2">Meta Description:</h3>
                                     <p>{generatedContent.metaDescription}</p>
                                 </div>
                             </div>
@@ -402,3 +432,4 @@ const GenerateArticle = () => {
 };
 
 export default GenerateArticle;
+
