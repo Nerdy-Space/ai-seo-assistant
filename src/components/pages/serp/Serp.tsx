@@ -113,50 +113,13 @@ const SerpChecker = () => {
                 }]
             });
 
-            console.log(postRequest)
+            console.log(postRequest.data.tasks[0].result[0].items)
 
             const taskId = postRequest.data.tasks[0].id;
-            // Store the task ID in cookies for 1 day
             Cookies.set('taskId', taskId, { expires: 1 });
 
-            let taskReady = false;
-
-            // Check task readiness every 2 minutes
-            // while (!taskReady) {
-            //     await new Promise(resolve => setTimeout(resolve, 120)); // Wait 2 minutes
-            //     const checkTaskReady = await axios({
-            //         method: 'get',
-            //         url: `https://api.dataforseo.com/v3/serp/google/organic/tasks_ready`,
-            //         auth: {
-            //             username: 'aiman@outdated.digital',
-            //             password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
-            //         },
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //         },
-            //     });
-
-            //     const taskIdsReady = checkTaskReady.data.tasks.map((task: { id: string }) => task.id);
-            //     if (taskIdsReady.includes(taskId)) {
-            //         taskReady = true;
-            //     }
-            // }
-
-            // Once task is ready, fetch the results
-            // const response = await axios({
-            //     method: 'get',
-            //     url: `https://api.dataforseo.com/v3/serp/google/organic/task_get/regular/${taskId}`,
-            //     auth: {
-            //         username: 'aiman@outdated.digital',
-            //         password: `${process.env.NEXT_PUBLIC_SEO_KEY}`
-            //     },
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            // });
-
-            // console.log(response.data)
-            // setResults(response.data.tasks[0].result[0].items); // Set results
+           
+            setResults(postRequest.data.tasks[0].result[0].items); // Set results
             setLoading(false); // Hide loader when data is fetched
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -187,7 +150,7 @@ const SerpChecker = () => {
             </div>
         );
     }
-    
+
     return (
         <div className="max-w-[1440px] mx-auto px-4 pt-10 pb-16">
             <div className="relative p-6 bg-white shadow-md rounded-lg">
@@ -277,6 +240,7 @@ const SerpChecker = () => {
                 <thead>
                   <tr className="bg-gray-200">
                     <th className="p-3 text-left font-semibold text-gray-600">Rank</th>
+                    <th className="p-3 text-left font-semibold text-gray-600">Type</th>
                     <th className="p-3 text-left font-semibold text-gray-600">Title</th>
                     <th className="p-3 text-left font-semibold text-gray-600">Domain</th>
                     <th className="p-3 text-left font-semibold text-gray-600">URL</th>
@@ -289,6 +253,7 @@ const SerpChecker = () => {
                       className={`border-b border-gray-200 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors duration-150`}
                     >
                       <td className="p-3 text-gray-800">{result.rank_absolute}</td>
+                      <td className="p-3 text-gray-800">{result.type}</td>
                       <td className="p-3 text-gray-800 font-medium">{result.title}</td>
                       <td className="p-3 text-gray-600">{result.domain}</td>
                       <td className="p-3 text-blue-600 hover:text-blue-800">
