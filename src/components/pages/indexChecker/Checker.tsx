@@ -6,22 +6,25 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie"
+import Cookies from "js-cookie";
+import Swal from "sweetalert2";
+import ReactConfetti from "react-confetti";
+
 
 const Checker = () => {
     const { isLoaded, isSignedIn } = useUser();
     const router = useRouter();
 
-   
-       useEffect(() => {
-           if (!isLoaded) return; // Wait until the user state is loaded
-           if (!isSignedIn) {
-               router.push("/"); // Redirect to sign-in if not signed in
-           }
-       }, [isLoaded, isSignedIn, router]);
+    useEffect(() => {
+        if (!isLoaded) return; // Wait until the user state is loaded
+        if (!isSignedIn) {
+            router.push("/"); // Redirect to sign-in if not signed in
+        }
+    }, [isLoaded, isSignedIn, router]);
 
     const [url, setUrl] = useState("");
     const [status, setStatus] = useState<string | null>(null);
+    const [showConfetti, setShowConfetti] = useState(false);
 
     const checkGoogleIndex = async (url: string) => {
         const count = parseInt(Cookies.get("Google Index Checker") || "0", 10);
@@ -36,16 +39,44 @@ const Checker = () => {
             });
 
             if (response.status === 200) {
-                setStatus(
-                    Number(response.data.searchInformation.totalResults) < 1
-                        ? "Not Indexed"
-                        : "Indexed"
-                );
+                const isIndexed = Number(response.data.searchInformation.totalResults) > 0;
+                setStatus(isIndexed ? "Indexed" : "Not Indexed");
+                showResultPopup(isIndexed);
             }
         } catch (error) {
             console.error("Error checking index status:", error);
             setStatus("Could not fetch index status.");
+            showErrorPopup();
         }
+    };
+
+    const showResultPopup = (isIndexed: boolean) => {
+        if (isIndexed) {
+            setShowConfetti(true);
+            Swal.fire({
+                title: "🎉 Congratulations!",
+                text: "Your URL is indexed by Google!",
+                icon: "success",
+                confirmButtonText: "Great!",
+                didClose: () => setShowConfetti(false),
+            });
+        } else {
+            Swal.fire({
+                title: "😢 Not Indexed",
+                text: "Your URL is not indexed by Google yet.",
+                icon: "error",
+                confirmButtonText: "Try Again",
+            });
+        }
+    };
+
+    const showErrorPopup = () => {
+        Swal.fire({
+            title: "🚨 Error",
+            text: "Could not fetch the index status. Please try again later.",
+            icon: "warning",
+            confirmButtonText: "Okay",
+        });
     };
 
     const handleCheckIndex = () => {
@@ -64,31 +95,24 @@ const Checker = () => {
     }
 
     return (
-        <div className="flex flex-col items-center p-6 max-w-4xl mx-auto">
+        <div className="flex flex-col items-center p-6 max-w-4xl mx-auto min-h-[80vh]">
+            {showConfetti && <ReactConfetti />}
             <div className="w-full mb-6">
                 <h2 className="text-2xl font-semibold mb-4 text-center">Google Index Checker</h2>
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex flex-col justify-center items-center gap-4">
                     <Input
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
                         placeholder="Enter page URL"
-                        className="flex-1"
+                        className="flex-1 py-3"
                     />
-                    <Button onClick={handleCheckIndex} className="bg-[#3B82F6] text-white hover:bg-[#2563EB]">Check Index</Button>
+                    <Button
+                        onClick={handleCheckIndex}
+                        className="bg-[#3B82F6] text-white hover:bg-[#2563EB]"
+                    >
+                        Check Index
+                    </Button>
                 </div>
-            </div>
-            <div className="w-full text-center">
-                <h3 className="text-xl font-semibold mb-4">Index Status</h3>
-                {status && (
-                    <div>
-                        <Button
-                            className={`px-6 py-2 font-medium ${status === "Indexed" ? "bg-green-500" : "bg-red-500"
-                                }`}
-                        >
-                            {status}
-                        </Button>
-                    </div>
-                )}
             </div>
         </div>
     );
