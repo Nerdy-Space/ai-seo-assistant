@@ -10,7 +10,7 @@ import Cookies from "js-cookie";
 import Image from "next/image";
 
 const GraphGenerator = () => {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { isLoaded, isSignedIn } = useUser();
       const router = useRouter();
   
       useEffect(() => {

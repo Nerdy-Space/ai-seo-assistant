@@ -18,7 +18,7 @@ import Image from "next/image";
 import Cookies from "js-cookie";
 
 const GenerateArticle = () => {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
     const router = useRouter();
     const loaderTexts = [
   "Something great is cooking...",

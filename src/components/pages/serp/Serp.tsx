@@ -33,7 +33,7 @@ type Language = {
 };
 
 const SerpChecker = () => {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { isLoaded, isSignedIn } = useUser();
     const router = useRouter();
 
     useEffect(() => {

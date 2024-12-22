@@ -23,7 +23,7 @@ const Checker = () => {
     }, [isLoaded, isSignedIn, router]);
 
     const [url, setUrl] = useState("");
-    const [status, setStatus] = useState<string | null>(null);
+    // const [status, setStatus] = useState<string | null>(null);
     const [showConfetti, setShowConfetti] = useState(false);
 
     const checkGoogleIndex = async (url: string) => {
@@ -40,12 +40,12 @@ const Checker = () => {
 
             if (response.status === 200) {
                 const isIndexed = Number(response.data.searchInformation.totalResults) > 0;
-                setStatus(isIndexed ? "Indexed" : "Not Indexed");
+                // setStatus(isIndexed ? "Indexed" : "Not Indexed");
                 showResultPopup(isIndexed);
             }
         } catch (error) {
             console.error("Error checking index status:", error);
-            setStatus("Could not fetch index status.");
+            // setStatus("Could not fetch index status.");
             showErrorPopup();
         }
     };
