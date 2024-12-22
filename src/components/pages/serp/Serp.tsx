@@ -58,11 +58,9 @@ const SerpChecker = () => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const response = await axios.get("https://restcountries.com/v3.1/all");
-                setCountries(response.data.map((country: { cca2: string; name: { common: string } }) => ({
-                    code: country.cca2,
-                    name: country.name.common,
-                })));
+                const response = await axios.get("/countries.data.json");
+                console.log(response)
+                setCountries(response.data);
             } catch (error) {
                 console.error("Error fetching countries:", error);
             }
@@ -113,7 +111,7 @@ const SerpChecker = () => {
                 }]
             });
 
-            console.log(postRequest.data.tasks[0].result[0].items)
+            console.log(postRequest.data)
 
             const taskId = postRequest.data.tasks[0].id;
             Cookies.set('taskId', taskId, { expires: 1 });
